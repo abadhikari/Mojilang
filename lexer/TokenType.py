@@ -46,3 +46,6 @@ class TokenType(Enum):
 
     EOF = 'EOF'
 
+    @classmethod
+    def valid_print_types(cls):
+        return {cls.NUMBER, cls.STRING, cls.VAR}
