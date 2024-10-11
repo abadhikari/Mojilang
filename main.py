@@ -2,7 +2,7 @@ from lexer import Lexer
 from parser import Parser
 from interpreter import Interpreter
 
-with open('helloWorld.emo') as f:
+with open('variable.emo') as f:
     s = f.read()
     emo_lexer = Lexer(s)
     emo_lexer.scan_tokens()
@@ -14,7 +14,3 @@ with open('helloWorld.emo') as f:
 
     emo_interpreter = Interpreter(abstract_syntax_tree)
     emo_interpreter.execute()
-
-
-
-

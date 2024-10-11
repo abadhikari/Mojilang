@@ -48,4 +48,8 @@ class TokenType(Enum):
 
     @classmethod
     def valid_print_types(cls):
-        return {cls.NUMBER, cls.STRING, cls.VAR}
+        return {cls.NUMBER, cls.STRING, cls.IDENTIFIER}
+
+    @classmethod
+    def valid_assignment_types(cls):
+        return {cls.NUMBER, cls.STRING, cls.IDENTIFIER}
