@@ -7,3 +7,6 @@ class LiteralNode(AbstractSyntaxTreeNode):
 
     def evaluate(self, context):
         return self._value
+
+    def __repr__(self):
+        return self._value

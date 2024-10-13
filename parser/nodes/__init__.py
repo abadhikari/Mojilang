@@ -17,7 +17,8 @@ from .operation import (
     ModulusNode,
     MultiplicationNode,
     OperationNode,
-    SubtractionNode
+    SubtractionNode,
+    OperationContext
 )
 
 __all__ = [
@@ -40,5 +41,6 @@ __all__ = [
     'ModulusNode',
     'MultiplicationNode',
     'OperationNode',
-    'SubtractionNode'
+    'SubtractionNode',
+    'OperationContext'
 ]

@@ -2,7 +2,7 @@ from lexer import Lexer
 from parser import Parser
 from interpreter import Interpreter
 
-with open('variable.emo') as f:
+with open('emoLangFiles/variable.emo') as f:
     s = f.read()
     emo_lexer = Lexer(s)
     emo_lexer.scan_tokens()

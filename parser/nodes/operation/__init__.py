@@ -5,6 +5,7 @@ from .ModulusNode import ModulusNode
 from .MultiplicationNode import MultiplicationNode
 from .OperationNode import OperationNode
 from .SubtractionNode import SubtractionNode
+from .OperationContext import OperationContext
 
 __all__ = [
     'AdditionNode',
@@ -13,5 +14,6 @@ __all__ = [
     'ModulusNode',
     'MultiplicationNode',
     'OperationNode',
-    'SubtractionNode'
+    'SubtractionNode',
+    'OperationContext'
 ]

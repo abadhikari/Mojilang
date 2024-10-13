@@ -53,3 +53,7 @@ class TokenType(Enum):
     @classmethod
     def valid_assignment_types(cls):
         return {cls.NUMBER, cls.STRING, cls.IDENTIFIER}
+
+    @classmethod
+    def operation_types(cls):
+        return {cls.MULTIPLY, cls.DIVIDE, cls.PLUS, cls.MINUS, cls.MODULUS, cls.EXPONENT}
