@@ -11,6 +11,9 @@ class Token:
     def get_token_type(self):
         return self._token_type
 
+    def is_token_type(self, token_type):
+        return self._token_type == token_type
+
     def get_line(self):
         return self._line
 

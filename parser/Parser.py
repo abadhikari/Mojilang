@@ -12,7 +12,18 @@ from parser.nodes import (
     PrintNode,
     StringLiteralNode,
     VariableNode,
-    OperationContext
+    BinaryOperationContext,
+    AndNode,
+    EqualsNode,
+    GreaterNode,
+    GreaterEqualsNode,
+    LessNode,
+    LessEqualsNode,
+    NotNode,
+    NotEqualsNode,
+    OrNode,
+    BooleanLiteralNode,
+    UnaryOperationContext
 )
 
 
@@ -32,35 +43,60 @@ class Parser:
         if index is None:
             index = self._current
         token = self._retrieve_token(index)
-        if token.get_token_type() == TokenType.PRINT:
+        if token.is_token_type(TokenType.PRINT):
             return self._parse_print_token()
-        if token.get_token_type() == TokenType.STRING:
-            return self._parse_string_token()
-        if token.get_token_type() == TokenType.NUMBER:
-            return self._parse_number_token(index)
-        if token.get_token_type() == TokenType.IDENTIFIER:
-            return self._parse_identifier_token()
-        if token.get_token_type() == TokenType.VAR:
+        if token.is_token_type(TokenType.IDENTIFIER):
+            return self._parse_identifier_token(index)
+        if token.is_token_type(TokenType.VAR):
             return self._parse_var_token()
-        if token.get_token_type() == TokenType.EQUAL:
-            expression = self._parse_expression()
-            return expression
+        if token.get_token_type() in TokenType.literal_types():
+            return self._parse_literal(token)
         if token.get_token_type() in TokenType.operation_types():
             return self._parse_operation(token, context)
 
+    def _parse_literal(self, token):
+        if token.is_token_type(TokenType.STRING):
+            return StringLiteralNode(token.get_literal())
+        if token.is_token_type(TokenType.NUMBER):
+            return NumberLiteralNode(token.get_literal())
+        if token.is_token_type(TokenType.TRUE):
+            return BooleanLiteralNode(True)
+        if token.is_token_type(TokenType.FALSE):
+            return BooleanLiteralNode(False)
+
     def _parse_operation(self, token, context):
-        if token.get_token_type() == TokenType.PLUS:
+        if token.is_token_type(TokenType.PLUS):
             return AdditionNode(context.get_left_operand(), context.get_right_operand())
-        if token.get_token_type() == TokenType.MINUS:
+        if token.is_token_type(TokenType.MINUS):
             return SubtractionNode(context.get_left_operand(), context.get_right_operand())
-        if token.get_token_type() == TokenType.MULTIPLY:
+        if token.is_token_type(TokenType.MULTIPLY):
             return MultiplicationNode(context.get_left_operand(), context.get_right_operand())
-        if token.get_token_type() == TokenType.DIVIDE:
+        if token.is_token_type(TokenType.DIVIDE):
             return DivisionNode(context.get_left_operand(), context.get_right_operand())
-        if token.get_token_type() == TokenType.MODULUS:
+        if token.is_token_type(TokenType.MODULUS):
             return ModulusNode(context.get_left_operand(), context.get_right_operand())
-        if token.get_token_type() == TokenType.EXPONENT:
+        if token.is_token_type(TokenType.EXPONENT):
             return ExponentNode(context.get_left_operand(), context.get_right_operand())
+        if token.is_token_type(TokenType.AND):
+            return AndNode(context.get_left_operand(), context.get_right_operand())
+        if token.is_token_type(TokenType.OR):
+            return OrNode(context.get_left_operand(), context.get_right_operand())
+        if token.is_token_type(TokenType.GREATER):
+            return GreaterNode(context.get_left_operand(), context.get_right_operand())
+        if token.is_token_type(TokenType.GREATER_EQUAL):
+            return GreaterEqualsNode(context.get_left_operand(), context.get_right_operand())
+        if token.is_token_type(TokenType.GREATER):
+            return GreaterNode(context.get_left_operand(), context.get_right_operand())
+        if token.is_token_type(TokenType.LESS):
+            return LessNode(context.get_left_operand(), context.get_right_operand())
+        if token.is_token_type(TokenType.LESS_EQUAL):
+            return LessEqualsNode(context.get_left_operand(), context.get_right_operand())
+        if token.is_token_type(TokenType.BANG_EQUAL):
+            return NotEqualsNode(context.get_left_operand(), context.get_right_operand())
+        if token.is_token_type(TokenType.EQUAL_EQUAL):
+            return EqualsNode(context.get_left_operand(), context.get_right_operand())
+        if token.is_token_type(TokenType.BANG):
+            return NotNode(context.get_operand())
 
     def _parse_print_token(self):
         self._validate_token({TokenType.LEFT_PAREN}, "Expected '(' for print statement.")
@@ -71,23 +107,16 @@ class Parser:
         self._current += 1
         return PrintNode(node_to_print)
 
-    def _parse_string_token(self):
-        string_token = self._current_token()
-        return StringLiteralNode(string_token.get_literal())
-
-    def _parse_number_token(self, index):
-        number_token = self._retrieve_token(index)
-        return NumberLiteralNode(number_token.get_literal())
-
-    def _parse_identifier_token(self):
-        identifier_token = self._current_token()
+    def _parse_identifier_token(self, index):
+        identifier_token = self._retrieve_token(index)
         return VariableNode(identifier_token.get_lexeme())
 
     def _parse_var_token(self):
         self._validate_token({TokenType.IDENTIFIER}, "Expected an identifier for assignment.")
-        variable_node = self._handle_token()
+        variable_node = self._parse_identifier_token(self._current)
         self._validate_token({TokenType.EQUAL}, "Expected '✍️' for assignment.")
-        value_node = self._handle_token()
+        self._current += 1
+        value_node = self._parse_expression()
         self._current = self._find_next_semicolon_index() - 1
         self._validate_token({TokenType.SEMI_COLON}, "Expected ';' to terminate the statement.")
         self._current += 1
@@ -95,7 +124,7 @@ class Parser:
 
     def _parse_expression(self):
         end_of_expression_index = self._find_next_semicolon_index()
-        node = self._parse_expression_recursive(self._current + 1, end_of_expression_index - 1)
+        node = self._parse_expression_recursive(self._current, end_of_expression_index - 1)
         if not node:
             raise SyntaxException(self._current_token().get_line(), "Invalid expression: no valid operations found.")
         return node
@@ -116,6 +145,10 @@ class Parser:
         if self._within_parens(left_token, right_token):
             return self._parse_expression_recursive(left_index + 1, right_index - 1)
         operator_precedence = [
+            {TokenType.EQUAL_EQUAL, TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.LESS_EQUAL, TokenType.LESS, TokenType.BANG_EQUAL},
+            {TokenType.BANG},
+            {TokenType.AND},
+            {TokenType.OR},
             {TokenType.MINUS, TokenType.PLUS},
             {TokenType.MULTIPLY, TokenType.DIVIDE, TokenType.MODULUS},
             {TokenType.EXPONENT}
@@ -123,8 +156,10 @@ class Parser:
         for operators in operator_precedence:
             index = left_index
             while index < right_index:
-                index = self._skip_parentheses(index, right_index)
-                node = self._divide_by_operations(operators, left_index, right_index, index)
+                token = self._retrieve_token(index)
+                if token.is_token_type(TokenType.LEFT_PAREN):
+                    index = self._skip_parentheses(index, right_index)
+                node = self._handle_by_operations(operators, left_index, right_index, index)
                 if node:
                     return node
                 index += 1
@@ -133,28 +168,44 @@ class Parser:
         paren_counter = 0
         while left_index <= right_index:
             token = self._retrieve_token(left_index)
-            if token.get_token_type() == TokenType.LEFT_PAREN:
+            if token.is_token_type(TokenType.LEFT_PAREN):
                 paren_counter += 1
-            if token.get_token_type() == TokenType.RIGHT_PAREN:
+            if token.is_token_type(TokenType.RIGHT_PAREN):
                 paren_counter -= 1
             if paren_counter == 0:
                 break
             left_index += 1
         return left_index + 1
 
-    def _divide_by_operations(self, operations, left_index, right_index, index):
+    def _handle_by_operations(self, operations, left_index, right_index, index):
         token = self._retrieve_token(index)
-        if token.get_token_type() in operations:
-            left_node = self._parse_expression_recursive(left_index, index - 1)
-            right_node = self._parse_expression_recursive(index + 1, right_index)
-            if left_node is None or right_node is None:
-                raise SyntaxException(token.get_line(), "Invalid expression: missing left or right operand.")
+        token_type = token.get_token_type()
+        if token_type in operations:
+            if token_type in TokenType.unary_operations():
+                return self._handle_unary_operation(index, right_index)
+            else:
+                return self._handle_binary_operation(left_index, index, right_index)
 
-            context = OperationContext(left_node, right_node)
-            return self._handle_token(index, context)
+    def _handle_unary_operation(self, index, right_index):
+        token = self._retrieve_token(index)
+        right_node = self._parse_expression_recursive(index + 1, right_index)
+        if right_node is None:
+            raise SyntaxException(token.get_line(), "Invalid expression: missing right operand.")
+        context = UnaryOperationContext(right_node)
+        return self._handle_token(index, context)
+
+    def _handle_binary_operation(self, left_index, index, right_index):
+        token = self._retrieve_token(index)
+        left_node = self._parse_expression_recursive(left_index, index - 1)
+        right_node = self._parse_expression_recursive(index + 1, right_index)
+        if left_node is None or right_node is None:
+            raise SyntaxException(token.get_line(), "Invalid expression: missing left or right operand.")
+
+        context = BinaryOperationContext(left_node, right_node)
+        return self._handle_token(index, context)
 
     def _within_parens(self, left_token, right_token):
-        return left_token.get_token_type() == TokenType.LEFT_PAREN and right_token.get_token_type() == TokenType.RIGHT_PAREN
+        return left_token.is_token_type(TokenType.LEFT_PAREN) and right_token.is_token_type(TokenType.RIGHT_PAREN)
 
     def _validate_token(self, expected_token_types, error_message):
         next_index = self._current + 1
@@ -169,7 +220,7 @@ class Parser:
 
     def _is_eof_token(self):
         token = self._current_token()
-        return token.get_token_type() == TokenType.EOF
+        return token.is_token_type(TokenType.EOF)
 
     def _current_token(self):
         return self._retrieve_token(self._current)

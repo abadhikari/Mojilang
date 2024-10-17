@@ -3,13 +3,13 @@ from .AssignmentNode import AssignmentNode
 from .BlockNode import BlockNode
 from .Callable import Callable
 from .FunctionNode import FunctionNode
-from .IfNode import IfNode
 from .InputNode import InputNode
 from .PrintNode import PrintNode
 from .ReturnNode import ReturnNode
 from .VariableNode import VariableNode
 
-from .literal import LiteralNode, NumberLiteralNode, StringLiteralNode
+from .control import IfNode, NotNode
+from .literal import LiteralNode, NumberLiteralNode, StringLiteralNode, BooleanLiteralNode
 from .operation import (
     AdditionNode,
     DivisionNode,
@@ -18,7 +18,16 @@ from .operation import (
     MultiplicationNode,
     OperationNode,
     SubtractionNode,
-    OperationContext
+    BinaryOperationContext,
+    AndNode,
+    EqualsNode,
+    GreaterNode,
+    GreaterEqualsNode,
+    LessNode,
+    LessEqualsNode,
+    NotEqualsNode,
+    OrNode,
+    UnaryOperationContext
 )
 
 __all__ = [
@@ -27,7 +36,7 @@ __all__ = [
     'BlockNode',
     'Callable',
     'FunctionNode',
-    'IfNode',
+    'NotNode',
     'InputNode',
     'PrintNode',
     'ReturnNode',
@@ -42,5 +51,16 @@ __all__ = [
     'MultiplicationNode',
     'OperationNode',
     'SubtractionNode',
-    'OperationContext'
+    'BinaryOperationContext',
+    'IfNode',
+    'AndNode',
+    'EqualsNode',
+    'GreaterNode',
+    'GreaterEqualsNode',
+    'LessNode',
+    'LessEqualsNode',
+    'NotEqualsNode',
+    'OrNode',
+    'BooleanLiteralNode',
+    'UnaryOperationContext'
 ]

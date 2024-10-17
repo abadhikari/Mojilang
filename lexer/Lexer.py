@@ -60,12 +60,8 @@ class Lexer:
             self._add_token(TokenType.IF)
         elif character == '💅':
             self._add_token(TokenType.ELSE)
-        elif character == '👯':
-            self._add_token(TokenType.AND)
-        elif character == '🧍':
-            self._add_token(TokenType.OR)
         elif character == '🔁':
-            self._add_token(TokenType.OR)
+            self._add_token(TokenType.LOOP)
         elif character == '🗣':
             self._add_token(TokenType.PRINT)
         elif character == '🥸':
@@ -94,7 +90,14 @@ class Lexer:
             if character.isdigit():
                 self._number()
             elif character.isalnum():
-                self._identifier()
+                if self._peek_next(2) == 'and':
+                    self._current += 2
+                    self._add_token(TokenType.AND)
+                elif self._peek_next(1) == 'or':
+                    self._current += 1
+                    self._add_token(TokenType.OR)
+                else:
+                    self._identifier()
             else:
                 unexpected_character_exception = SyntaxException(self._line, "Unexpected character.")
                 self._exceptions.append(unexpected_character_exception)
@@ -149,11 +152,11 @@ class Lexer:
         number = self._source[self._start: self._current]
         self._add_token(TokenType.NUMBER, float(number))
 
-    def _peek_next(self):
-        next_index = self._current + 1
+    def _peek_next(self, next_count):
+        next_index = self._current + next_count
         if next_index >= len(self._source):
             return '\0'
-        return self._source[next_index]
+        return self._source[self._start:next_index]
 
     def _identifier(self):
         while self._peek().isalnum():

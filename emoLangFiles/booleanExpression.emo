@@ -1,0 +1,12 @@
+🥸 isTrueAnd ✍️ 😤 and 😔;
+🥸 isTrueOr ✍️ 😤 or 😔;
+🥸 isEquivalent ✍️ 4 🙅🤝 (8 ➗ 2) ✖️3;
+🥸 isGreater ✍️ 4 ☝️ (8 ➗ 2) ✖️3;
+🥸 isLess ✍️ 4 👇 (8 ➗ 2) ✖️3;
+🥸 notIsLess ✍️ 🙅isLess;
+🗣️(isTrueAnd);
+🗣️(isTrueOr);
+🗣️(isEquivalent);
+🗣️(isGreater);
+🗣️(isLess);
+🗣️(notIsLess);
