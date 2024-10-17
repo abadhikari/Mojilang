@@ -34,10 +34,20 @@ class Parser:
 
     def parse(self):
         nodes = []
-        while self._current < len(self._tokens) and not self._is_eof_token():
+        while self._in_bounds(self._current) and not self._is_eof_token():
             node = self._handle_token()
             nodes.append(node)
         return BlockNode(nodes)
+
+    def _in_bounds(self, index):
+        return index < len(self._tokens)
+
+    def _is_eof_token(self):
+        token = self._current_token()
+        return token.is_token_type(TokenType.EOF)
+
+    def _current_token(self):
+        return self._retrieve_token(self._current)
 
     def _handle_token(self, index=None, context=None):
         if index is None:
@@ -54,71 +64,38 @@ class Parser:
         if token.get_token_type() in TokenType.operation_types():
             return self._parse_operation(token, context)
 
-    def _parse_literal(self, token):
-        if token.is_token_type(TokenType.STRING):
-            return StringLiteralNode(token.get_literal())
-        if token.is_token_type(TokenType.NUMBER):
-            return NumberLiteralNode(token.get_literal())
-        if token.is_token_type(TokenType.TRUE):
-            return BooleanLiteralNode(True)
-        if token.is_token_type(TokenType.FALSE):
-            return BooleanLiteralNode(False)
-
-    def _parse_operation(self, token, context):
-        if token.is_token_type(TokenType.PLUS):
-            return AdditionNode(context.get_left_operand(), context.get_right_operand())
-        if token.is_token_type(TokenType.MINUS):
-            return SubtractionNode(context.get_left_operand(), context.get_right_operand())
-        if token.is_token_type(TokenType.MULTIPLY):
-            return MultiplicationNode(context.get_left_operand(), context.get_right_operand())
-        if token.is_token_type(TokenType.DIVIDE):
-            return DivisionNode(context.get_left_operand(), context.get_right_operand())
-        if token.is_token_type(TokenType.MODULUS):
-            return ModulusNode(context.get_left_operand(), context.get_right_operand())
-        if token.is_token_type(TokenType.EXPONENT):
-            return ExponentNode(context.get_left_operand(), context.get_right_operand())
-        if token.is_token_type(TokenType.AND):
-            return AndNode(context.get_left_operand(), context.get_right_operand())
-        if token.is_token_type(TokenType.OR):
-            return OrNode(context.get_left_operand(), context.get_right_operand())
-        if token.is_token_type(TokenType.GREATER):
-            return GreaterNode(context.get_left_operand(), context.get_right_operand())
-        if token.is_token_type(TokenType.GREATER_EQUAL):
-            return GreaterEqualsNode(context.get_left_operand(), context.get_right_operand())
-        if token.is_token_type(TokenType.GREATER):
-            return GreaterNode(context.get_left_operand(), context.get_right_operand())
-        if token.is_token_type(TokenType.LESS):
-            return LessNode(context.get_left_operand(), context.get_right_operand())
-        if token.is_token_type(TokenType.LESS_EQUAL):
-            return LessEqualsNode(context.get_left_operand(), context.get_right_operand())
-        if token.is_token_type(TokenType.BANG_EQUAL):
-            return NotEqualsNode(context.get_left_operand(), context.get_right_operand())
-        if token.is_token_type(TokenType.EQUAL_EQUAL):
-            return EqualsNode(context.get_left_operand(), context.get_right_operand())
-        if token.is_token_type(TokenType.BANG):
-            return NotNode(context.get_operand())
+    def _retrieve_token(self, index):
+        return self._tokens[index]
 
     def _parse_print_token(self):
-        self._validate_token({TokenType.LEFT_PAREN}, "Expected '(' for print statement.")
-        self._validate_token(TokenType.valid_print_types(), "Incompatible value for print.")
+        self._validate_next_token({TokenType.LEFT_PAREN}, "Expected '(' for print statement.")
+        self._validate_next_token(TokenType.valid_print_types(), "Incompatible value for print.")
         node_to_print = self._handle_token()
-        self._validate_token({TokenType.RIGHT_PAREN}, "Expected ')' to close print statement.")
-        self._validate_token({TokenType.SEMI_COLON}, "Expected ';' to terminate statement.")
+        self._validate_next_token({TokenType.RIGHT_PAREN}, "Expected ')' to close print statement.")
+        self._validate_next_token({TokenType.SEMI_COLON}, "Expected ';' to terminate statement.")
         self._current += 1
         return PrintNode(node_to_print)
+
+    def _validate_next_token(self, expected_token_types, error_message):
+        next_index = self._current + 1
+        if self._in_bounds(next_index):
+            next_token = self._retrieve_token(next_index)
+            if next_token.get_token_type() not in expected_token_types:
+                raise SyntaxException(next_token.get_line(), error_message)
+            self._current = next_index
 
     def _parse_identifier_token(self, index):
         identifier_token = self._retrieve_token(index)
         return VariableNode(identifier_token.get_lexeme())
 
     def _parse_var_token(self):
-        self._validate_token({TokenType.IDENTIFIER}, "Expected an identifier for assignment.")
+        self._validate_next_token({TokenType.IDENTIFIER}, "Expected an identifier for assignment.")
         variable_node = self._parse_identifier_token(self._current)
-        self._validate_token({TokenType.EQUAL}, "Expected '✍️' for assignment.")
+        self._validate_next_token({TokenType.EQUAL}, "Expected '✍️' for assignment.")
         self._current += 1
         value_node = self._parse_expression()
         self._current = self._find_next_semicolon_index() - 1
-        self._validate_token({TokenType.SEMI_COLON}, "Expected ';' to terminate the statement.")
+        self._validate_next_token({TokenType.SEMI_COLON}, "Expected ';' to terminate the statement.")
         self._current += 1
         return AssignmentNode(variable_node, value_node)
 
@@ -164,6 +141,9 @@ class Parser:
                     return node
                 index += 1
 
+    def _within_parens(self, left_token, right_token):
+        return left_token.is_token_type(TokenType.LEFT_PAREN) and right_token.is_token_type(TokenType.RIGHT_PAREN)
+
     def _skip_parentheses(self, left_index, right_index):
         paren_counter = 0
         while left_index <= right_index:
@@ -204,26 +184,40 @@ class Parser:
         context = BinaryOperationContext(left_node, right_node)
         return self._handle_token(index, context)
 
-    def _within_parens(self, left_token, right_token):
-        return left_token.is_token_type(TokenType.LEFT_PAREN) and right_token.is_token_type(TokenType.RIGHT_PAREN)
+    def _parse_literal(self, token):
+        if token.is_token_type(TokenType.STRING):
+            return StringLiteralNode(token.get_literal())
+        if token.is_token_type(TokenType.NUMBER):
+            return NumberLiteralNode(token.get_literal())
+        if token.is_token_type(TokenType.TRUE):
+            return BooleanLiteralNode(True)
+        if token.is_token_type(TokenType.FALSE):
+            return BooleanLiteralNode(False)
 
-    def _validate_token(self, expected_token_types, error_message):
-        next_index = self._current + 1
-        if self._in_bounds(next_index):
-            next_token = self._retrieve_token(next_index)
-            if next_token.get_token_type() not in expected_token_types:
-                raise SyntaxException(next_token.get_line(), error_message)
-            self._current = next_index
+    def _parse_operation(self, token, context):
+        binary_operation_map = {
+            TokenType.AND: AndNode,
+            TokenType.BANG_EQUAL: NotEqualsNode,
+            TokenType.DIVIDE: DivisionNode,
+            TokenType.EQUAL_EQUAL: EqualsNode,
+            TokenType.EXPONENT: ExponentNode,
+            TokenType.GREATER: GreaterNode,
+            TokenType.GREATER_EQUAL: GreaterEqualsNode,
+            TokenType.LESS: LessNode,
+            TokenType.LESS_EQUAL: LessEqualsNode,
+            TokenType.MINUS: SubtractionNode,
+            TokenType.MODULUS: ModulusNode,
+            TokenType.MULTIPLY: MultiplicationNode,
+            TokenType.OR: OrNode,
+            TokenType.PLUS: AdditionNode,
+        }
+        token_type = token.get_token_type()
+        if token_type in binary_operation_map:
+            operation_class = binary_operation_map[token_type]
+            left_operand, right_operand = context.get_left_operand(), context.get_right_operand()
+            return operation_class(left_operand, right_operand)
 
-    def _in_bounds(self, index):
-        return index < len(self._tokens)
+        if token.is_token_type(TokenType.BANG):
+            return NotNode(context.get_operand())
 
-    def _is_eof_token(self):
-        token = self._current_token()
-        return token.is_token_type(TokenType.EOF)
 
-    def _current_token(self):
-        return self._retrieve_token(self._current)
-
-    def _retrieve_token(self, index):
-        return self._tokens[index]

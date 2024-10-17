@@ -47,16 +47,12 @@ class TokenType(Enum):
     EOF = 'EOF'
 
     @classmethod
-    def valid_print_types(cls):
-        return {cls.NUMBER, cls.STRING, cls.IDENTIFIER}
-
-    @classmethod
-    def valid_assignment_types(cls):
-        return {cls.NUMBER, cls.STRING, cls.IDENTIFIER}
-
-    @classmethod
     def literal_types(cls):
         return {cls.NUMBER, cls.STRING, cls.TRUE, cls.FALSE}
+
+    @classmethod
+    def valid_print_types(cls):
+        return {cls.IDENTIFIER} | cls.literal_types()
 
     @classmethod
     def operation_types(cls):
