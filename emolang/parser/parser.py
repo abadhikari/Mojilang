@@ -3,6 +3,7 @@ from emolang.parser.nodes import (
     AssignmentNode,
     AdditionNode,
     MultiplicationNode,
+    IfNode,
     SubtractionNode,
     ModulusNode,
     DivisionNode,
@@ -100,6 +101,8 @@ class Parser:
             return self._parse_identifier_token(index)
         if token.is_token_type(TokenType.VAR):
             return self._parse_var_token()
+        if token.is_token_type(TokenType.IF):
+            return self._parse_if_statement()
         if token.get_token_type() in TokenType.literal_types():
             return self._parse_literal(token)
         if token.get_token_type() in TokenType.operation_types():
@@ -208,10 +211,10 @@ class Parser:
         if self._within_parens(left_token, right_token):
             return self._parse_expression_recursive(left_index + 1, right_index - 1)
         operator_precedence = [
+            {TokenType.OR},
+            {TokenType.AND},
             {TokenType.EQUAL_EQUAL, TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.LESS_EQUAL, TokenType.LESS, TokenType.BANG_EQUAL},
             {TokenType.BANG},
-            {TokenType.AND},
-            {TokenType.OR},
             {TokenType.MINUS, TokenType.PLUS},
             {TokenType.MULTIPLY, TokenType.DIVIDE, TokenType.MODULUS},
             {TokenType.EXPONENT}
@@ -315,6 +318,33 @@ class Parser:
 
         context = BinaryOperationContext(left_node, right_node)
         return self._handle_token(index, context)
+
+    def _parse_if_statement(self):
+        self._validate_token({TokenType.IF}, "Expected '🤔' for if statement.")
+        condition_node = self._parse_expression()
+        self._validate_token({TokenType.LEFT_BRACE}, "Expected '{' to begin if statement block.")
+        if_block_node = self._parse_block()
+        self._validate_token({TokenType.RIGHT_BRACE}, "Expected '}' to begin if statement block.")
+        else_block_node = self._parse_else()
+        return IfNode(condition_node, if_block_node, else_block_node)
+
+    def _parse_block(self):
+        nodes = []
+        while not self._current_token().is_token_type(TokenType.RIGHT_BRACE):
+            if self._is_eof_token():
+                raise SyntaxException(self._current_token().get_line(), "Missing closing right brace.")
+            node = self._handle_token()
+            nodes.append(node)
+        return BlockNode(nodes)
+
+    def _parse_else(self):
+        else_block_node = None
+        if self._current_token().is_token_type(TokenType.ELSE):
+            self._validate_token({TokenType.ELSE}, "Expected '💅' for else.")
+            self._validate_token({TokenType.LEFT_BRACE}, "Expected '{' to begin else block.")
+            else_block_node = self._parse_block()
+            self._validate_token({TokenType.RIGHT_BRACE}, "Expected '}' to begin else block.")
+        return else_block_node
 
     def _parse_literal(self, token):
         """

@@ -42,23 +42,40 @@ To run an EmoLang program, follow these steps:
 ## Syntax
 EmoLang uses emojis to represent common programming constructs. Below is an overview of the syntax:
 
-1. Variables
+1. **Variables**
+ 
 Define variables using the 🥸 emoji, followed by the variable name, the assignment emoji ✍️, a value, and semicolon (all statements must end in a semicolon):
 ```
 🥸 variable ✍️ 5;
 ```
 
-1. Print Statements
+2. Print Statements
 The 🗣️ emoji is used for printing output:
 ```
 🗣️("Hello, World!");
 ```
 
-1. Example
-Here's an example utilizing both:
+3. **If Statements**
+
+The 🤔 emoji is used for if statements, 💅 is used for else, 😤 is the equivalent of true.
 ```
-🥸 variable ✍️ 3 ➕ ((3 ➕2) ✖️2);
-🗣️(variable);
+🤔(😤) {
+    🗣️("This is true.");
+} 💅 {
+    🗣️("This is false.");
+}
+```
+
+4. **Example**
+
+Here's an example utilizing everything:
+```
+🥸 age ✍️ 25;
+🤔(age ☝️ 21) {
+    🗣️("You can drink 😤!");
+} 💅 {
+    🗣️("You can't drink 😔!");
+}
 ```
 
 ## How It Works

@@ -11,4 +11,4 @@ class IfNode(AbstractSyntaxTreeNode):
         if self._condition_node.evaluate(context):
             return self._if_block_node.evaluate(context)
         else:
-            return self._else_block_node.evaluate(context)
+            return self._else_block_node.evaluate(context) if self._else_block_node else None
