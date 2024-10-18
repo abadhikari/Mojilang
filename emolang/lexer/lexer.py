@@ -4,7 +4,19 @@ from .syntax_exception import SyntaxException
 
 
 class Lexer:
+    """
+    The Lexer class is responsible for scanning the source code and converting it into a list of tokens.
+
+    It processes the source code character by character, grouping characters into tokens based on the
+    predefined rules of the EmoLang language. It also tracks line numbers for error reporting.
+    """
+
     def __init__(self, source):
+        """
+        Initializes the Lexer with the source code to be scanned.
+
+        :param source: The source code as a string.
+        """
         self._source = source
 
         self._exceptions = []
@@ -14,6 +26,12 @@ class Lexer:
         self._line = 1
 
     def scan_tokens(self):
+        """
+        Scans the source code and generates a list of tokens.
+
+        This method loops through the source code, scanning each character until
+        the end of the source is reached. Once all tokens are scanned, an EOF token is added.
+        """
         while not self._is_at_end():
             self._start = self._current
             self._scan_token()
@@ -22,9 +40,20 @@ class Lexer:
         self._tokens.append(end_of_file_token)
 
     def _is_at_end(self):
+        """
+        Checks if the lexer has reached the end of the source code.
+
+        :return: True if the current index is at or beyond the end of the source, False otherwise.
+        """
         return self._current >= len(self._source)
 
     def _scan_token(self):
+        """
+        Scans the next character in the source code and converts it into a token.
+
+        Depending on the character, this method generates the appropriate token or handles
+        special cases like whitespace, comments, strings, and numbers.
+        """
         character = self._advance()
         if character == '(':
             self._add_token(TokenType.LEFT_PAREN)
@@ -103,16 +132,33 @@ class Lexer:
                 self._exceptions.append(unexpected_character_exception)
 
     def _advance(self):
+        """
+        Advances the current index and returns the next character from the source code.
+
+        :return: The current character at the current index.
+        """
         character = self._source[self._current]
         self._current += 1
         return character
 
     def _add_token(self, token_type, literal=None):
+        """
+        Adds a new token to the list of scanned tokens.
+
+        :param token_type: The type of the token (e.g., LEFT_PAREN, NUMBER).
+        :param literal: The literal value of the token, if applicable (e.g., for strings or numbers).
+        """
         text = self._source[self._start:self._current]
         new_token = Token(token_type, text, literal, self._line)
         self._tokens.append(new_token)
 
     def _match(self, expected):
+        """
+        Checks if the next character matches the expected character, and advances if it does.
+
+        :param expected: The character to match.
+        :return: True if the expected character matches, False otherwise.
+        """
         if self._is_at_end():
             return False
         if self._source[self._current] != expected:
@@ -121,11 +167,21 @@ class Lexer:
         return True
 
     def _peek(self):
+        """
+        Returns the next character in the source without advancing the index.
+
+        :return: The next character or '\0' if at the end of the source.
+        """
         if self._is_at_end():
             return '\0'
         return self._source[self._current]
 
     def _string(self):
+        """
+        Handles string literals by scanning until the closing quotation mark or end of the source.
+
+        Raises a SyntaxException if the string is unterminated.
+        """
         while self._peek() != '"' and not self._is_at_end():
             if self._peek() == '\n':
                 self._line += 1
@@ -141,6 +197,9 @@ class Lexer:
         self._add_token(TokenType.STRING, value)
 
     def _number(self):
+        """
+        Scans a numeric literal, handling integers and floating-point numbers.
+        """
         while self._peek().isdigit():
             self._advance()
 
@@ -153,15 +212,29 @@ class Lexer:
         self._add_token(TokenType.NUMBER, float(number))
 
     def _peek_next(self, next_count):
+        """
+        Peeks ahead to check the next 'next_count' characters without advancing the index.
+
+        :param next_count: The number of characters to peek ahead.
+        :return: The substring starting from the current position up to next_count characters.
+        """
         next_index = self._current + next_count
         if next_index >= len(self._source):
             return '\0'
         return self._source[self._start:next_index]
 
     def _identifier(self):
+        """
+        Scans an identifier (variable name or keyword) from the source code.
+        """
         while self._peek().isalnum():
             self._advance()
         self._add_token(TokenType.IDENTIFIER)
 
     def get_tokens(self):
+        """
+        Returns the list of tokens that have been scanned.
+
+        :return: A list of Token objects.
+        """
         return self._tokens
