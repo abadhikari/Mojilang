@@ -174,8 +174,6 @@ class Parser:
         """
         end_of_expression_index = self._find_end_of_expression_index()
         node = self._parse_expression_recursive(self._current, end_of_expression_index - 1)
-        if not node:
-            raise SyntaxException(self._current_token().get_line(), "Invalid expression: no valid operations found.")
         self._current = end_of_expression_index
         return node
 
@@ -208,7 +206,7 @@ class Parser:
             if token_type not in TokenType.valid_expression_types():
                 raise SyntaxException(left_token.get_line(), f"Invalid token in expression: {token_type}")
             return self._handle_token(left_index)
-        if self._within_parens(left_token, right_token):
+        if self._is_nested_parens(left_index, right_index):
             return self._parse_expression_recursive(left_index + 1, right_index - 1)
         operator_precedence = [
             {TokenType.OR},
@@ -230,14 +228,66 @@ class Parser:
                     return node
                 index += 1
 
-    def _within_parens(self, left_token, right_token):
+        raise SyntaxException(
+            self._retrieve_token(left_index).get_line(),
+            "Invalid expression: no valid operations found."
+        )
+
+    def _is_nested_parens(self, left_index, right_index):
+        """
+        Checks if the parentheses between the given left and right indices are nested,
+        meaning that the parentheses are part of the same nested group.
+
+        :param left_index: The index of the left parenthesis.
+        :param right_index: The index of the right bound for the search.
+        :return: `True` if the parentheses are nested, `False` otherwise.
+        """
+        if not self._within_parens(left_index, right_index):
+            return False
+
+        paren_counter, end_index = self._find_parenthesis_count(left_index, right_index)
+        return paren_counter == 0 and end_index == right_index
+
+    def _find_parenthesis_count(self, left_index, right_index):
+        """
+        Scans the tokens between `left_index` and `right_index` to find where a set of parentheses closes
+        and the balance of parentheses between the bounds.
+
+        :param left_index: The index of the left parenthesis `'('` where the search begins.
+        :param right_index: The index of the right bound for the search.
+        :return: A tuple containing:
+            - `paren_counter` (int): The final count of parentheses (should be zero if parentheses are balanced).
+            - `current_index` (int): The index at which the parentheses balance returns to zero.
+        :raises SyntaxException: If there are unmatched left or right parentheses within the given range.
+        """
+        paren_counter = 0
+        current_index = left_index
+        while current_index <= right_index:
+            token = self._retrieve_token(current_index)
+            if token.is_token_type(TokenType.LEFT_PAREN):
+                paren_counter += 1
+            if token.is_token_type(TokenType.RIGHT_PAREN):
+                paren_counter -= 1
+            if paren_counter == 0:
+                break
+            current_index += 1
+
+        token_line = self._retrieve_token(right_index).get_line()
+        if paren_counter > 0:
+            raise SyntaxException(token_line, 'Left parenthesis missing closing right.')
+        elif paren_counter < 0:
+            raise SyntaxException(token_line, 'Right parenthesis missing corresponding left.')
+        return paren_counter, current_index
+
+    def _within_parens(self, left_index, right_index):
         """
         Checks if the given tokens are within parentheses.
 
-        :param left_token: The left token.
-        :param right_token: The right token.
+        :param left_index: The left token index.
+        :param right_index: The right token index.
         :return: True if the tokens are within parentheses, False otherwise.
         """
+        left_token, right_token = self._retrieve_token(left_index), self._retrieve_token(right_index)
         return left_token.is_token_type(TokenType.LEFT_PAREN) and right_token.is_token_type(TokenType.RIGHT_PAREN)
 
     def _skip_parentheses(self, left_index, right_index):
@@ -248,22 +298,8 @@ class Parser:
         :param right_index: The ending index.
         :return: The index of the token after the closing parenthesis.
         """
-        paren_counter = 0
-        while left_index <= right_index:
-            token = self._retrieve_token(left_index)
-            if token.is_token_type(TokenType.LEFT_PAREN):
-                paren_counter += 1
-            if token.is_token_type(TokenType.RIGHT_PAREN):
-                paren_counter -= 1
-            if paren_counter == 0:
-                break
-            left_index += 1
-        token_line = self._retrieve_token(left_index).get_line()
-        if paren_counter > 0:
-            raise SyntaxException(token_line, 'Left parenthesis missing closing right.')
-        elif paren_counter < 0:
-            raise SyntaxException(token_line, 'Right parenthesis missing closing left.')
-        return left_index + 1
+        paren_counter, end_index = self._find_parenthesis_count(left_index, right_index)
+        return min(end_index + 1, right_index)
 
     def _handle_by_operations(self, operations, left_index, right_index, index):
         """
@@ -320,6 +356,11 @@ class Parser:
         return self._handle_token(index, context)
 
     def _parse_if_statement(self):
+        """
+        Parses an if statement in the source code.
+
+        :return: An IfNode representing the parsed if-else statement.
+        """
         self._validate_token({TokenType.IF}, "Expected '🤔' for if statement.")
         condition_node = self._parse_expression()
         self._validate_token({TokenType.LEFT_BRACE}, "Expected '{' to begin if statement block.")
@@ -329,6 +370,12 @@ class Parser:
         return IfNode(condition_node, if_block_node, else_block_node)
 
     def _parse_block(self):
+        """
+        Parses a block of code enclosed in curly braces `{}`. If no closing brace
+        is found, it raises a SyntaxException.
+
+        :return: A BlockNode representing the parsed block of code.
+        """
         nodes = []
         while not self._current_token().is_token_type(TokenType.RIGHT_BRACE):
             if self._is_eof_token():
@@ -338,6 +385,11 @@ class Parser:
         return BlockNode(nodes)
 
     def _parse_else(self):
+        """
+        Parses an optional else block in an if-else statement.
+
+        :return: A BlockNode representing the else block or None if no else block is present.
+        """
         else_block_node = None
         if self._current_token().is_token_type(TokenType.ELSE):
             self._validate_token({TokenType.ELSE}, "Expected '💅' for else.")
