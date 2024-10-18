@@ -8,7 +8,7 @@ from .print_node import PrintNode
 from .return_node import ReturnNode
 from .variable_node import VariableNode
 
-from .control import IfNode, NotNode
+from .control import IfNode, ElseIfNode, ElseNode, NotNode, ConditionalNode
 from .literal import LiteralNode, NumberLiteralNode, StringLiteralNode, BooleanLiteralNode
 from .operation import (
     AdditionNode,
@@ -53,6 +53,9 @@ __all__ = [
     'SubtractionNode',
     'BinaryOperationContext',
     'IfNode',
+    'ElseNode',
+    'ElseIfNode',
+    'ConditionalNode',
     'AndNode',
     'EqualsNode',
     'GreaterNode',

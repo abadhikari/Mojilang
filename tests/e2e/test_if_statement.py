@@ -84,3 +84,21 @@ def test_nested_if_statements(capsys):
     expected_output = "You are an adult.\nYou are eligible for senior discounts.\n"
     captured = run_interpreter_and_retrieve_output(source_code, capsys)
     assert captured.out == expected_output
+
+
+def test_if_else(capsys):
+    source_code = """
+    🥸 age ✍️ 22;
+    🤔(age 🤝 23) {
+        🗣️("You're 23, you can drink 😤!");
+    } 🙈(age 🤝 22) {
+        🗣️("You're 22, you can drink 😤!");
+    } 🙈(age ☝️ 21) {
+        🗣️("You're above 21, you can drink 😤!");
+    } 💅 {
+        🗣️("You can't drink 😔!");
+    }
+    """
+    expected_output = "You're 22, you can drink 😤!\n"
+    captured = run_interpreter_and_retrieve_output(source_code, capsys)
+    assert captured.out == expected_output

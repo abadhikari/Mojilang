@@ -57,7 +57,7 @@ The 🗣️ emoji is used for printing output:
 
 3. **If Statements**
 
-The 🤔 emoji is used for if statements, 💅 is used for else, 😤 is the equivalent of true.
+The 🤔 emoji is used for if statements, 🙈 is used for if else, 💅 is used for else, 😤 is the equivalent of true.
 ```
 🤔(😤) {
     🗣️("This is true.");
@@ -70,9 +70,11 @@ The 🤔 emoji is used for if statements, 💅 is used for else, 😤 is the equ
 
 Here's an example utilizing everything:
 ```
-🥸 age ✍️ 25;
+🥸 age ✍️ 20;
 🤔(age ☝️ 21) {
     🗣️("You can drink 😤!");
+} 🙈(age 🤝 20) {
+    🗣️("You're so close but you still can't drink 😩!");
 } 💅 {
     🗣️("You can't drink 😔!");
 }

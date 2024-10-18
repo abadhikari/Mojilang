@@ -4,6 +4,8 @@ from emolang.parser.nodes import (
     AdditionNode,
     MultiplicationNode,
     IfNode,
+    ElseIfNode,
+    ElseNode,
     SubtractionNode,
     ModulusNode,
     DivisionNode,
@@ -359,15 +361,24 @@ class Parser:
         """
         Parses an if statement in the source code.
 
-        :return: An IfNode representing the parsed if-else statement.
+        :return: An IfNode representing the parsed if statement.
         """
         self._validate_token({TokenType.IF}, "Expected '🤔' for if statement.")
+        condition_node, block_node = self._parse_conditional()
+        next_conditional = self._parse_next_if_conditional()
+        return IfNode(condition_node, block_node, next_conditional)
+
+    def _parse_conditional(self):
+        """
+        Parse the condition and block of an if statement.
+
+        :return: Tuple containing the condition node and block node.
+        """
         condition_node = self._parse_expression()
         self._validate_token({TokenType.LEFT_BRACE}, "Expected '{' to begin if statement block.")
         if_block_node = self._parse_block()
         self._validate_token({TokenType.RIGHT_BRACE}, "Expected '}' to begin if statement block.")
-        else_block_node = self._parse_else()
-        return IfNode(condition_node, if_block_node, else_block_node)
+        return condition_node, if_block_node
 
     def _parse_block(self):
         """
@@ -384,9 +395,25 @@ class Parser:
             nodes.append(node)
         return BlockNode(nodes)
 
+    def _parse_next_if_conditional(self):
+        """
+        Parses an optional elseif block chain in an if statement.
+
+        :return: A BlockNode representing the elseif node or None if not present.
+        """
+        if self._current_token().is_token_type(TokenType.ELSE):
+            return self._parse_else()
+        if self._current_token().get_token_type() not in TokenType.if_statement_tokens():
+            return
+        if self._current_token().is_token_type(TokenType.ELSEIF):
+            self._validate_token({TokenType.ELSEIF}, "Expected '🙈' for elseif statement.")
+            condition_node, block_node = self._parse_conditional()
+            next_conditional = self._parse_next_if_conditional()
+            return ElseIfNode(condition_node, block_node, next_conditional)
+
     def _parse_else(self):
         """
-        Parses an optional else block in an if-else statement.
+        Parses an optional else block in an if statement.
 
         :return: A BlockNode representing the else block or None if no else block is present.
         """
@@ -396,7 +423,7 @@ class Parser:
             self._validate_token({TokenType.LEFT_BRACE}, "Expected '{' to begin else block.")
             else_block_node = self._parse_block()
             self._validate_token({TokenType.RIGHT_BRACE}, "Expected '}' to begin else block.")
-        return else_block_node
+        return ElseNode(else_block_node)
 
     def _parse_literal(self, token):
         """

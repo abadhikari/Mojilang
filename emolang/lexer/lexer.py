@@ -87,6 +87,8 @@ class Lexer:
             self._add_token(TokenType.FALSE)
         elif character == '🤔':
             self._add_token(TokenType.IF)
+        elif character == '🙈':
+            self._add_token(TokenType.ELSEIF)
         elif character == '💅':
             self._add_token(TokenType.ELSE)
         elif character == '🔁':

@@ -42,6 +42,7 @@ class TokenType(Enum):
     # Keywords
     AND = 'AND'
     ELSE = 'ELSE'
+    ELSEIF = 'ELSEIF'
     FALSE = 'FALSE'
     LOOP = 'LOOP'
     IF = 'IF'
@@ -103,3 +104,7 @@ class TokenType(Enum):
         :return: A set containing valid token types for expressions.
         """
         return cls.valid_print_types() | cls.operation_types() | {cls.LEFT_PAREN, cls.RIGHT_PAREN}
+
+    @classmethod
+    def if_statement_tokens(cls):
+        return {cls.IF, cls.ELSEIF, cls.ELSE}

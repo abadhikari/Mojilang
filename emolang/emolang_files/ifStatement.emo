@@ -1,6 +1,8 @@
-🥸 age ✍️ 25;
-🤔(age ☝️ 21 and 😔) {
+🥸 age ✍️ 20;
+🤔(age ☝️ 21) {
     🗣️("You can drink 😤!");
+} 🙈(age 🤝 20) {
+    🗣️("You're so close but you still can't drink 😩!");
 } 💅 {
     🗣️("You can't drink 😔!");
 }
