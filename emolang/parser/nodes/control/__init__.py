@@ -3,6 +3,7 @@ from .else_if_node import ElseIfNode
 from .else_node import ElseNode
 from .not_node import NotNode
 from .conditional_node import ConditionalNode
+from .loop_node import LoopNode
 
 
 __all__ = [
@@ -10,5 +11,6 @@ __all__ = [
     'ElseIfNode',
     'ElseNode',
     'NotNode',
-    'ConditionalNode'
+    'ConditionalNode',
+    'LoopNode'
 ]

@@ -27,7 +27,8 @@ from emolang.parser.nodes import (
     OrNode,
     BooleanLiteralNode,
     UnaryOperationContext,
-    ReassignmentNode
+    ReassignmentNode,
+    LoopNode
 )
 
 
@@ -117,6 +118,8 @@ class Parser:
             return self._parse_var_token()
         if token.is_token_type(TokenType.IF):
             return self._parse_if_statement()
+        if token.is_token_type(TokenType.LOOP):
+            return self._parse_loop()
         if token.get_token_type() in TokenType.literal_types():
             return self._parse_literal(token)
         if token.get_token_type() in TokenType.operation_types():
@@ -472,6 +475,19 @@ class Parser:
             else_block_node = self._parse_block()
             self._validate_token({TokenType.RIGHT_BRACE}, "Expected '}' to begin else block.")
             return ElseNode(else_block_node, line_number)
+
+    def _parse_loop(self):
+        """
+        Parses a loop in the source code.
+
+        :return: An LoopNode representing the parsed loop.
+        """
+        line_number = self._validate_token({TokenType.LOOP}, "Expected '🔁' for loop.")
+        condition_node = self._parse_expression()
+        self._validate_token({TokenType.LEFT_BRACE}, "Expected '{' to begin if statement block.")
+        loop_block_node = self._parse_block()
+        self._validate_token({TokenType.RIGHT_BRACE}, "Expected '}' to begin if statement block.")
+        return LoopNode(condition_node, loop_block_node, line_number)
 
     def _parse_literal(self, token):
         """

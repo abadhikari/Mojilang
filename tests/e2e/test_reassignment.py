@@ -1,5 +1,5 @@
 from emolang.lexer import SyntaxException
-from .run_interpreter import run_interpreter_and_retrieve_output
+from tests.e2e.utils.run_interpreter import run_interpreter_and_retrieve_output
 
 
 def test_variable_reassignment(capsys):

@@ -9,7 +9,7 @@ from .print_node import PrintNode
 from .return_node import ReturnNode
 from .variable_node import VariableNode
 
-from .control import IfNode, ElseIfNode, ElseNode, NotNode, ConditionalNode
+from .control import IfNode, ElseIfNode, ElseNode, NotNode, ConditionalNode, LoopNode
 from .literal import LiteralNode, NumberLiteralNode, StringLiteralNode, BooleanLiteralNode
 from .operation import (
     AdditionNode,
@@ -67,5 +67,6 @@ __all__ = [
     'OrNode',
     'BooleanLiteralNode',
     'UnaryOperationContext',
-    'ReassignmentNode'
+    'ReassignmentNode',
+    'LoopNode'
 ]

@@ -66,9 +66,20 @@ The 🤔 emoji is used for if statements, 🙈 is used for if else, 💅 is used
 }
 ```
 
-4. **Example**
+4. **Loops**
+The 🔁 emoji is used for loops.
+```
+🥸 i ✍️ 10;
+🔁(i ☝️ 0) {
+    🗣️(i);
+    i ✍️ i ➖ 1;
+}
+🗣️("Blast off!");
+```
 
-Here's an example utilizing everything:
+5. **Example**
+
+Here's an example utilizing several constructs from above:
 ```
 🥸 age ✍️ 20;
 🤔(age ☝️ 21) {

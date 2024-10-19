@@ -2,7 +2,7 @@ from emolang.lexer import Lexer
 from emolang.parser import Parser
 from emolang.interpreter import Interpreter
 
-with open('emolang/emolang_files/ifStatement.emo') as f:
+with open('emolang/emolang_files/loop.emo') as f:
     s = f.read()
     emo_lexer = Lexer(s)
     emo_lexer.scan_tokens()
