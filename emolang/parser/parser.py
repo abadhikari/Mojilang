@@ -1,32 +1,15 @@
 from emolang.lexer import TokenType, SyntaxException
 from emolang.parser.nodes import (
     AssignmentNode,
-    AdditionNode,
-    MultiplicationNode,
     IfNode,
     ElseIfNode,
     ElseNode,
-    SubtractionNode,
-    ModulusNode,
-    DivisionNode,
-    ExponentNode,
     BlockNode,
     NumberLiteralNode,
     PrintNode,
     StringLiteralNode,
     VariableNode,
-    BinaryOperationContext,
-    AndNode,
-    EqualsNode,
-    GreaterNode,
-    GreaterEqualsNode,
-    LessNode,
-    LessEqualsNode,
-    NotNode,
-    NotEqualsNode,
-    OrNode,
     BooleanLiteralNode,
-    UnaryOperationContext,
     ReassignmentNode,
     LoopNode,
     BlockScope,
@@ -36,6 +19,8 @@ from emolang.parser.nodes import (
 from emolang.parser.parser_state import ParserState
 from emolang.parser.scope import Scope
 from emolang.parser.scope.scope_manager import ScopeManager
+from emolang.parser.expression_parser import ExpressionParser
+from emolang.parser.operation_parser import OperationParser
 
 
 class Parser:
@@ -54,6 +39,9 @@ class Parser:
         self._state = ParserState(tokens)
         self._scope = Scope()
 
+        self._expression_parser = ExpressionParser(self)
+        self._operation_parser = OperationParser()
+
     def parse(self):
         """
         The main entry point for parsing. It loops through the tokens and parses each one,
@@ -65,11 +53,11 @@ class Parser:
         nodes = []
         with ScopeManager(self._scope, BlockScope.DEFAULT):
             while self._state.in_bounds(self._state.get_current()) and not self._state.is_eof_token():
-                node = self._handle_token()
+                node = self.handle_token()
                 nodes.append(node)
             return BlockNode(nodes, self._scope.create_copy(), line_number)
 
-    def _handle_token(self, index=None, context=None):
+    def handle_token(self, index=None, context=None):
         """
         Handles a token based on its type. This function delegates token-specific logic to
         different parsing methods (e.g., print, identifier, variable).
@@ -100,7 +88,7 @@ class Parser:
         if token.get_token_type() in TokenType.literal_types():
             return self._parse_literal(token)
         if token.get_token_type() in TokenType.operation_types():
-            return self._parse_operation(token, context)
+            return self._operation_parser.parse(token, context)
 
     def _parse_print_token(self):
         """
@@ -110,7 +98,7 @@ class Parser:
         :return: PrintNode representing the print statement.
         """
         line_number = self._validate_token({TokenType.PRINT}, "Expected '🗣️' for print statement.")
-        node_to_print = self._parse_expression()
+        node_to_print = self._expression_parser.parse()
         self._validate_token({TokenType.SEMI_COLON}, "Expected ';' to terminate statement.")
         return PrintNode(node_to_print, line_number)
 
@@ -172,7 +160,7 @@ class Parser:
         variable_node = self._parse_identifier_token(self._state.get_current())
         line_number = self._validate_token({TokenType.IDENTIFIER}, "Expected an identifier for assignment.")
         self._validate_token({TokenType.EQUAL}, "Expected '✍️' for assignment.")
-        value_node = self._parse_expression()
+        value_node = self._expression_parser.parse()
         self._validate_token({TokenType.SEMI_COLON}, "Expected ';' to terminate the statement.")
         return variable_node, value_node, line_number
 
@@ -186,195 +174,6 @@ class Parser:
         self._validate_token({TokenType.VAR}, "Expected '🥸' to indicate variable.")
         variable_node, value_node, line_number = self._parse_assignment()
         return AssignmentNode(variable_node, value_node, line_number)
-
-    def _parse_expression(self):
-        """
-        Parses an expression up to the specified end token (such as a semicolon or a right brace).
-
-        :return: The root node of the parsed expression.
-        """
-        end_of_expression_index = self._find_end_of_expression_index()
-        node = self._parse_expression_recursive(self._state.get_current(), end_of_expression_index - 1)
-        self._state.set_current(end_of_expression_index)
-        return node
-
-    def _find_end_of_expression_index(self):
-        """
-        Finds the index of the end of the expression specified token (such as a semicolon).
-        This is done by iterating until it encounters a token that shouldn't be found in
-        an expression.
-
-        :return: The index of the end of expression.
-        """
-        index = self._state.get_current()
-        valid_expression_tokens = TokenType.valid_expression_types()
-        while self._state.retrieve_token(index).get_token_type() in valid_expression_tokens:
-            index += 1
-        return index
-
-    def _parse_expression_recursive(self, left_index, right_index):
-        """
-        Recursively parses an expression within the given token range. Handles precedence and parentheses.
-
-        :param left_index: The left bound of the token range.
-        :param right_index: The right bound of the token range.
-        :return: The parsed expression node.
-        """
-        left_token, right_token = self._state.retrieve_token(left_index), self._state.retrieve_token(right_index)
-        index_delta = right_index - left_index
-        if index_delta == 0:
-            token_type = left_token.get_token_type()
-            if token_type not in TokenType.valid_expression_types():
-                raise SyntaxException(left_token.get_line(), f"Invalid token in expression: {token_type}")
-            return self._handle_token(left_index)
-        if self._is_nested_parens(left_index, right_index):
-            return self._parse_expression_recursive(left_index + 1, right_index - 1)
-        operator_precedence = [
-            {TokenType.OR},
-            {TokenType.AND},
-            {TokenType.EQUAL_EQUAL, TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.LESS_EQUAL, TokenType.LESS, TokenType.BANG_EQUAL},
-            {TokenType.BANG},
-            {TokenType.MINUS, TokenType.PLUS},
-            {TokenType.MULTIPLY, TokenType.DIVIDE, TokenType.MODULUS},
-            {TokenType.EXPONENT}
-        ]
-        for operators in operator_precedence:
-            index = left_index
-            while index < right_index:
-                token = self._state.retrieve_token(index)
-                if token.is_token_type(TokenType.LEFT_PAREN):
-                    index = self._skip_parentheses(index, right_index)
-                node = self._handle_by_operations(operators, left_index, right_index, index)
-                if node:
-                    return node
-                index += 1
-
-        raise SyntaxException(
-            self._state.retrieve_token(left_index).get_line(),
-            "Invalid expression: no valid operations found."
-        )
-
-    def _is_nested_parens(self, left_index, right_index):
-        """
-        Checks if the parentheses between the given left and right indices are nested,
-        meaning that the parentheses are part of the same nested group.
-
-        :param left_index: The index of the left parenthesis.
-        :param right_index: The index of the right bound for the search.
-        :return: `True` if the parentheses are nested, `False` otherwise.
-        """
-        if not self._within_parens(left_index, right_index):
-            return False
-
-        paren_counter, end_index = self._find_parenthesis_count(left_index, right_index)
-        return paren_counter == 0 and end_index == right_index
-
-    def _find_parenthesis_count(self, left_index, right_index):
-        """
-        Scans the tokens between `left_index` and `right_index` to find where a set of parentheses closes
-        and the balance of parentheses between the bounds.
-
-        :param left_index: The index of the left parenthesis `'('` where the search begins.
-        :param right_index: The index of the right bound for the search.
-        :return: A tuple containing:
-            - `paren_counter` (int): The final count of parentheses (should be zero if parentheses are balanced).
-            - `current_index` (int): The index at which the parentheses balance returns to zero.
-        :raises SyntaxException: If there are unmatched left or right parentheses within the given range.
-        """
-        paren_counter = 0
-        current_index = left_index
-        while current_index <= right_index:
-            token = self._state.retrieve_token(current_index)
-            if token.is_token_type(TokenType.LEFT_PAREN):
-                paren_counter += 1
-            if token.is_token_type(TokenType.RIGHT_PAREN):
-                paren_counter -= 1
-            if paren_counter == 0:
-                break
-            current_index += 1
-
-        token_line = self._state.retrieve_token(right_index).get_line()
-        if paren_counter > 0:
-            raise SyntaxException(token_line, 'Left parenthesis missing closing right.')
-        elif paren_counter < 0:
-            raise SyntaxException(token_line, 'Right parenthesis missing corresponding left.')
-        return paren_counter, current_index
-
-    def _within_parens(self, left_index, right_index):
-        """
-        Checks if the given tokens are within parentheses.
-
-        :param left_index: The left token index.
-        :param right_index: The right token index.
-        :return: True if the tokens are within parentheses, False otherwise.
-        """
-        left_token, right_token = self._state.retrieve_token(left_index), self._state.retrieve_token(right_index)
-        return left_token.is_token_type(TokenType.LEFT_PAREN) and right_token.is_token_type(TokenType.RIGHT_PAREN)
-
-    def _skip_parentheses(self, left_index, right_index):
-        """
-        Skips over a section of tokens enclosed in parentheses.
-
-        :param left_index: The starting index (left parenthesis).
-        :param right_index: The ending index.
-        :return: The index of the token after the closing parenthesis.
-        """
-        paren_counter, end_index = self._find_parenthesis_count(left_index, right_index)
-        return min(end_index + 1, right_index)
-
-    def _handle_by_operations(self, operations, left_index, right_index, index):
-        """
-        Handles binary and unary operations based on operator precedence.
-
-        :param operations: Set of operations to process.
-        :param left_index: Left bound of the expression.
-        :param right_index: Right bound of the expression.
-        :param index: Current token index.
-        :return: Node representing the operation, or None if no operation was found.
-        """
-        token = self._state.retrieve_token(index)
-        token_type = token.get_token_type()
-        if token_type in operations:
-            if token_type in TokenType.unary_operations():
-                return self._handle_unary_operation(index, right_index)
-            else:
-                return self._handle_binary_operation(left_index, index, right_index)
-
-    def _handle_unary_operation(self, index, right_index):
-        """
-        Handles unary operations (such as negation).
-
-        :param index: The index of the unary operator.
-        :param right_index: The right bound of the expression.
-        :return: Node representing the unary operation.
-        """
-        token = self._state.retrieve_token(index)
-        right_node = self._parse_expression_recursive(index + 1, right_index)
-        if right_node is None:
-            raise SyntaxException(token.get_line(), "Invalid expression: missing right operand.")
-        context = UnaryOperationContext(right_node)
-        return self._handle_token(index, context)
-
-    def _handle_binary_operation(self, left_index, index, right_index):
-        """
-        Handles binary operations (such as addition, subtraction, etc.).
-
-        :param left_index: Left bound of the left operand.
-        :param index: The index of the operator.
-        :param right_index: Right bound of the right operand.
-        :return: Node representing the binary operation.
-        """
-        token = self._state.retrieve_token(index)
-        left_node = self._parse_expression_recursive(left_index, index - 1)
-        if left_node is None:
-            raise SyntaxException(token.get_line(), "Invalid expression: missing left operand.")
-
-        right_node = self._parse_expression_recursive(index + 1, right_index)
-        if right_node is None:
-            raise SyntaxException(token.get_line(), "Invalid expression: missing right operand.")
-
-        context = BinaryOperationContext(left_node, right_node)
-        return self._handle_token(index, context)
 
     def _parse_if_statement(self):
         """
@@ -393,7 +192,7 @@ class Parser:
 
         :return: Tuple containing the condition node and block node.
         """
-        condition_node = self._parse_expression()
+        condition_node = self._expression_parser.parse()
         self._validate_token({TokenType.LEFT_BRACE}, "Expected '{' to begin if statement block.")
         if_block_node = self._parse_block(BlockScope.CONDITIONAL)
         self._validate_token({TokenType.RIGHT_BRACE}, "Expected '}' to begin if statement block.")
@@ -412,7 +211,7 @@ class Parser:
             while not self._state.current_token().is_token_type(TokenType.RIGHT_BRACE):
                 if self._state.is_eof_token():
                     raise SyntaxException(self._state.current_token().get_line(), "Missing closing right brace.")
-                node = self._handle_token()
+                node = self.handle_token()
                 nodes.append(node)
             return BlockNode(nodes, self._scope.create_copy(), line_number)
 
@@ -475,7 +274,7 @@ class Parser:
         :return: An LoopNode representing the parsed loop.
         """
         line_number = self._validate_token({TokenType.LOOP}, "Expected '🔁' for loop.")
-        condition_node = self._parse_expression()
+        condition_node = self._expression_parser.parse()
         self._validate_token({TokenType.LEFT_BRACE}, "Expected '{' to begin if statement block.")
         loop_block_node = self._parse_block(BlockScope.LOOP)
         self._validate_token({TokenType.RIGHT_BRACE}, "Expected '}' to begin if statement block.")
@@ -498,36 +297,8 @@ class Parser:
         if token.is_token_type(TokenType.FALSE):
             return BooleanLiteralNode(False, line_number)
 
-    def _parse_operation(self, token, context):
-        """
-        Parses an operation token and returns the appropriate operation node based on the context.
+    def get_scope(self):
+        return self._scope
 
-        :param token: The operation token to parse.
-        :param context: The context (unary or binary) in which the operation occurs.
-        :return: The corresponding operation node.
-        """
-        binary_operation_map = {
-            TokenType.AND: AndNode,
-            TokenType.BANG_EQUAL: NotEqualsNode,
-            TokenType.DIVIDE: DivisionNode,
-            TokenType.EQUAL_EQUAL: EqualsNode,
-            TokenType.EXPONENT: ExponentNode,
-            TokenType.GREATER: GreaterNode,
-            TokenType.GREATER_EQUAL: GreaterEqualsNode,
-            TokenType.LESS: LessNode,
-            TokenType.LESS_EQUAL: LessEqualsNode,
-            TokenType.MINUS: SubtractionNode,
-            TokenType.MODULUS: ModulusNode,
-            TokenType.MULTIPLY: MultiplicationNode,
-            TokenType.OR: OrNode,
-            TokenType.PLUS: AdditionNode,
-        }
-        token_type = token.get_token_type()
-        line_number = token.get_line()
-        if token_type in binary_operation_map:
-            operation_class = binary_operation_map[token_type]
-            left_operand, right_operand = context.get_left_operand(), context.get_right_operand()
-            return operation_class(left_operand, right_operand, line_number)
-
-        if token.is_token_type(TokenType.BANG):
-            return NotNode(context.get_operand(), line_number)
+    def get_state(self):
+        return self._state
