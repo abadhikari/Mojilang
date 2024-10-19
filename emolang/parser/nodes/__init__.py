@@ -1,5 +1,6 @@
 from .abstract_syntax_tree_node import AbstractSyntaxTreeNode
 from .assignment_node import AssignmentNode
+from .reassignment_node import ReassignmentNode
 from .block_node import BlockNode
 from .callable import Callable
 from .function_node import FunctionNode
@@ -65,5 +66,6 @@ __all__ = [
     'NotEqualsNode',
     'OrNode',
     'BooleanLiteralNode',
-    'UnaryOperationContext'
+    'UnaryOperationContext',
+    'ReassignmentNode'
 ]

@@ -2,7 +2,8 @@ from emolang.parser.nodes.abstract_syntax_tree_node import AbstractSyntaxTreeNod
 
 
 class PrintNode(AbstractSyntaxTreeNode):
-    def __init__(self, node_to_print):
+    def __init__(self, node_to_print, line_number):
+        super().__init__(line_number)
         self._node_to_print = node_to_print
 
     def evaluate(self, context):

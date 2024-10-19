@@ -3,7 +3,8 @@ from .return_node import ReturnNode
 
 
 class BlockNode(AbstractSyntaxTreeNode):
-    def __init__(self, nodes):
+    def __init__(self, nodes, line_number):
+        super().__init__(line_number)
         self._nodes = nodes
 
     def evaluate(self, context):

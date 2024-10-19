@@ -3,7 +3,8 @@ from emolang.parser.nodes.abstract_syntax_tree_node import AbstractSyntaxTreeNod
 
 
 class OperationNode(AbstractSyntaxTreeNode):
-    def __init__(self, left_operand, right_operand, value):
+    def __init__(self, left_operand, right_operand, value, line_number):
+        super().__init__(line_number)
         self._left_operand = left_operand
         self._right_operand = right_operand
         self.value = value

@@ -2,8 +2,8 @@ from emolang.parser.nodes.operation.operation_node import OperationNode
 
 
 class GreaterEqualsNode(OperationNode):
-    def __init__(self, left_operand, right_operand):
-        super().__init__(left_operand, right_operand, '>=')
+    def __init__(self, left_operand, right_operand, line_number):
+        super().__init__(left_operand, right_operand, '>=', line_number)
 
     def evaluate(self, context):
         left_value = self.get_left_operand().evaluate(context)

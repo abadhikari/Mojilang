@@ -2,7 +2,8 @@ from emolang.parser.nodes.abstract_syntax_tree_node import AbstractSyntaxTreeNod
 
 
 class VariableNode(AbstractSyntaxTreeNode):
-    def __init__(self, name):
+    def __init__(self, name, line_number):
+        super().__init__(line_number)
         self._name = name
 
     def evaluate(self, context):

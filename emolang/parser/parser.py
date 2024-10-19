@@ -26,7 +26,8 @@ from emolang.parser.nodes import (
     NotEqualsNode,
     OrNode,
     BooleanLiteralNode,
-    UnaryOperationContext
+    UnaryOperationContext,
+    ReassignmentNode
 )
 
 
@@ -53,11 +54,28 @@ class Parser:
 
         :return: BlockNode representing the entire parsed program.
         """
+        line_number = self._current_line_number()
         nodes = []
         while self._in_bounds(self._current) and not self._is_eof_token():
             node = self._handle_token()
             nodes.append(node)
-        return BlockNode(nodes)
+        return BlockNode(nodes, line_number)
+
+    def _current_line_number(self):
+        """
+        Retrieves the line number of the current token being processed.
+
+        :return: The line number of the current token.
+        """
+        return self._current_token().get_line()
+
+    def _current_token(self):
+        """
+        Retrieves the current token being processed.
+
+        :return: The current token.
+        """
+        return self._retrieve_token(self._current)
 
     def _in_bounds(self, index):
         """
@@ -77,14 +95,6 @@ class Parser:
         token = self._current_token()
         return token.is_token_type(TokenType.EOF)
 
-    def _current_token(self):
-        """
-        Retrieves the current token being processed.
-
-        :return: The current token.
-        """
-        return self._retrieve_token(self._current)
-
     def _handle_token(self, index=None, context=None):
         """
         Handles a token based on its type. This function delegates token-specific logic to
@@ -100,6 +110,8 @@ class Parser:
         if token.is_token_type(TokenType.PRINT):
             return self._parse_print_token()
         if token.is_token_type(TokenType.IDENTIFIER):
+            if self._is_reassignment_statement(index):
+                return self._parse_reassignment()
             return self._parse_identifier_token(index)
         if token.is_token_type(TokenType.VAR):
             return self._parse_var_token()
@@ -126,10 +138,10 @@ class Parser:
 
         :return: PrintNode representing the print statement.
         """
-        self._validate_token({TokenType.PRINT}, "Expected '🗣️' for print statement.")
+        line_number = self._validate_token({TokenType.PRINT}, "Expected '🗣️' for print statement.")
         node_to_print = self._parse_expression()
         self._validate_token({TokenType.SEMI_COLON}, "Expected ';' to terminate statement.")
-        return PrintNode(node_to_print)
+        return PrintNode(node_to_print, line_number)
 
     def _validate_token(self, valid_token_types, error_message):
         """
@@ -138,20 +150,60 @@ class Parser:
         :param valid_token_types: A set of token types that are valid while parsing this token.
         :param error_message: The error message to raise if validation fails.
         """
-        next_token = self._retrieve_token(self._current)
-        if next_token.get_token_type() not in valid_token_types:
-            raise SyntaxException(next_token.get_line(), error_message)
+        current_token = self._current_token()
+        token_line_number = current_token.get_line()
+        if current_token.get_token_type() not in valid_token_types:
+            raise SyntaxException(token_line_number, error_message)
         self._current += 1
+        return token_line_number
+
+    def _is_reassignment_statement(self, index):
+        """
+        Determines if an identifier is part of a statement that represents
+        a variable reassignment.
+
+        :param index: The index of the identifier token.
+        :return: if the statement is for variable reassignment.
+        """
+        previous_token, next_token = self._retrieve_token(index - 1), self._retrieve_token(index + 1)
+        return next_token.is_token_type(TokenType.EQUAL) and not previous_token.is_token_type(TokenType.VAR)
 
     def _parse_identifier_token(self, index):
         """
-        Parses an identifier token, which represents a variable.
+        Parses an identifier token, which represents an individual variable or represents
+        a variable reassignment.
 
         :param index: The index of the identifier token.
-        :return: VariableNode representing the variable.
+        :return: VariableNode representing the variable or ReassignmentNode with variable and new value.
         """
         identifier_token = self._retrieve_token(index)
-        return VariableNode(identifier_token.get_lexeme())
+        return VariableNode(identifier_token.get_lexeme(), identifier_token.get_line())
+
+    def _parse_reassignment(self):
+        """
+        Parses a reassignment statement in the source code.
+
+        :return: ReassignmentNode representing the reassignment of a variable.
+        """
+        variable_node, value_node, line_number = self._parse_assignment()
+        return ReassignmentNode(variable_node, value_node, line_number)
+
+    def _parse_assignment(self):
+        """
+        Parses an assignment statement in the source code.
+
+        :return: tuple: A tuple containing the following:
+            - VariableNode: A node representing the variable being assigned or reassigned.
+            - AbstractSyntaxTreeNode: A node representing the value assigned to the variable.
+            - int: The line number where the assignment occurs.
+        :raises: SyntaxException if the assignment statement is invalid, such as missing an identifier, assignment operator, or semicolon.
+        """
+        variable_node = self._parse_identifier_token(self._current)
+        line_number = self._validate_token({TokenType.IDENTIFIER}, "Expected an identifier for assignment.")
+        self._validate_token({TokenType.EQUAL}, "Expected '✍️' for assignment.")
+        value_node = self._parse_expression()
+        self._validate_token({TokenType.SEMI_COLON}, "Expected ';' to terminate the statement.")
+        return variable_node, value_node, line_number
 
     def _parse_var_token(self):
         """
@@ -161,12 +213,8 @@ class Parser:
         :return: AssignmentNode representing the variable assignment.
         """
         self._validate_token({TokenType.VAR}, "Expected '🥸' to indicate variable.")
-        variable_node = self._parse_identifier_token(self._current)
-        self._validate_token({TokenType.IDENTIFIER}, "Expected an identifier for assignment.")
-        self._validate_token({TokenType.EQUAL}, "Expected '✍️' for assignment.")
-        value_node = self._parse_expression()
-        self._validate_token({TokenType.SEMI_COLON}, "Expected ';' to terminate the statement.")
-        return AssignmentNode(variable_node, value_node)
+        variable_node, value_node, line_number = self._parse_assignment()
+        return AssignmentNode(variable_node, value_node, line_number)
 
     def _parse_expression(self):
         """
@@ -363,10 +411,10 @@ class Parser:
 
         :return: An IfNode representing the parsed if statement.
         """
-        self._validate_token({TokenType.IF}, "Expected '🤔' for if statement.")
+        line_number = self._validate_token({TokenType.IF}, "Expected '🤔' for if statement.")
         condition_node, block_node = self._parse_conditional()
         next_conditional = self._parse_next_if_conditional()
-        return IfNode(condition_node, block_node, next_conditional)
+        return IfNode(condition_node, block_node, next_conditional, line_number)
 
     def _parse_conditional(self):
         """
@@ -387,13 +435,14 @@ class Parser:
 
         :return: A BlockNode representing the parsed block of code.
         """
+        line_number = self._current_line_number()
         nodes = []
         while not self._current_token().is_token_type(TokenType.RIGHT_BRACE):
             if self._is_eof_token():
                 raise SyntaxException(self._current_token().get_line(), "Missing closing right brace.")
             node = self._handle_token()
             nodes.append(node)
-        return BlockNode(nodes)
+        return BlockNode(nodes, line_number)
 
     def _parse_next_if_conditional(self):
         """
@@ -406,10 +455,10 @@ class Parser:
         if self._current_token().get_token_type() not in TokenType.if_statement_tokens():
             return
         if self._current_token().is_token_type(TokenType.ELSEIF):
-            self._validate_token({TokenType.ELSEIF}, "Expected '🙈' for elseif statement.")
+            line_number = self._validate_token({TokenType.ELSEIF}, "Expected '🙈' for elseif statement.")
             condition_node, block_node = self._parse_conditional()
             next_conditional = self._parse_next_if_conditional()
-            return ElseIfNode(condition_node, block_node, next_conditional)
+            return ElseIfNode(condition_node, block_node, next_conditional, line_number)
 
     def _parse_else(self):
         """
@@ -417,13 +466,12 @@ class Parser:
 
         :return: A BlockNode representing the else block or None if no else block is present.
         """
-        else_block_node = None
         if self._current_token().is_token_type(TokenType.ELSE):
-            self._validate_token({TokenType.ELSE}, "Expected '💅' for else.")
+            line_number = self._validate_token({TokenType.ELSE}, "Expected '💅' for else.")
             self._validate_token({TokenType.LEFT_BRACE}, "Expected '{' to begin else block.")
             else_block_node = self._parse_block()
             self._validate_token({TokenType.RIGHT_BRACE}, "Expected '}' to begin else block.")
-        return ElseNode(else_block_node)
+            return ElseNode(else_block_node, line_number)
 
     def _parse_literal(self, token):
         """
@@ -432,14 +480,15 @@ class Parser:
         :param token: The literal token to parse.
         :return: Node representing the literal value.
         """
+        line_number = self._current_line_number()
         if token.is_token_type(TokenType.STRING):
-            return StringLiteralNode(token.get_literal())
+            return StringLiteralNode(token.get_literal(), line_number)
         if token.is_token_type(TokenType.NUMBER):
-            return NumberLiteralNode(token.get_literal())
+            return NumberLiteralNode(token.get_literal(), line_number)
         if token.is_token_type(TokenType.TRUE):
-            return BooleanLiteralNode(True)
+            return BooleanLiteralNode(True, line_number)
         if token.is_token_type(TokenType.FALSE):
-            return BooleanLiteralNode(False)
+            return BooleanLiteralNode(False, line_number)
 
     def _parse_operation(self, token, context):
         """
@@ -466,10 +515,11 @@ class Parser:
             TokenType.PLUS: AdditionNode,
         }
         token_type = token.get_token_type()
+        line_number = token.get_line()
         if token_type in binary_operation_map:
             operation_class = binary_operation_map[token_type]
             left_operand, right_operand = context.get_left_operand(), context.get_right_operand()
-            return operation_class(left_operand, right_operand)
+            return operation_class(left_operand, right_operand, line_number)
 
         if token.is_token_type(TokenType.BANG):
-            return NotNode(context.get_operand())
+            return NotNode(context.get_operand(), line_number)
