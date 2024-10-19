@@ -51,7 +51,7 @@ class Parser:
         """
         line_number = self._state.current_line_number()
         nodes = []
-        with ScopeManager(self._scope, BlockScope.DEFAULT):
+        with ScopeManager(self._scope, BlockScope.GLOBAL):
             while self._state.in_bounds(self._state.get_current()) and not self._state.is_eof_token():
                 node = self.handle_token()
                 nodes.append(node)

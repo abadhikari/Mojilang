@@ -9,6 +9,6 @@ class ReassignmentNode(AssignmentNode):
     def evaluate(self, context):
         new_value = self._value_node.evaluate(context)
         variable_name = self._variable_node.get_name()
-        if variable_name not in context:
+        if not context.contains_variable(variable_name):
             raise RuntimeException("Variable has not been declared yet.", self.get_line_number())
-        context[self._variable_node.get_name()] = new_value
+        context.assign_value(self._variable_node.get_name(), new_value)

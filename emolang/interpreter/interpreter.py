@@ -1,3 +1,6 @@
+from emolang.interpreter.scope_context import ScopeContext
+
+
 class Interpreter:
     """
     The Interpreter class is responsible for executing the Abstract Syntax Tree (AST).
@@ -12,7 +15,7 @@ class Interpreter:
         :param abstract_syntax_tree: The AST to be executed. This represents the parsed structure of the program.
         """
         self._abstract_syntax_tree = abstract_syntax_tree
-        self._context = {}
+        self._context = ScopeContext()
 
     def execute(self):
         """

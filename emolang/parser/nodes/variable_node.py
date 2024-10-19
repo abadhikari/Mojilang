@@ -7,7 +7,7 @@ class VariableNode(AbstractSyntaxTreeNode):
         self._name = name
 
     def evaluate(self, context):
-        return context[self._name]
+        return context.retrieve_variable_value(self._name)
 
     def get_name(self):
         return self._name

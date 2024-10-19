@@ -13,6 +13,7 @@ def test_variable_reassignment(capsys):
     captured = run_interpreter_and_retrieve_output(source_code, capsys)
     assert captured.out == expected_output
 
+
 def test_reassignment_with_expression(capsys):
     source_code = """
     🥸 y ✍️ 5;
