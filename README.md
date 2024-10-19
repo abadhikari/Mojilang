@@ -1,8 +1,8 @@
-# EmoLang 👻
+# Mojilang 👻
 
-EmoLang (EmojiLanguage 😉) is a simple programming language that utilizes emojis and is built from scratch with a custom lexer, parser, and interpreter. 
-My goal with EmoLang was to learn the basic inner workings of a programming language while also making a fun goofy programming language using emojis for common programming constructs like variables, loops, and conditionals.
-It's currently written in Python which will be terribly slow but I wanted to create a quick prototype before deciding if I wanted to sink weeks into creating it in C 😮‍💨.
+Mojilang (EmojiLanguage 😉) is a simple programming language that utilizes emojis and is built from scratch with a custom lexer, parser, and interpreter. 
+My goal with Mojilang was to learn the basic inner workings of a programming language while also making a fun goofy programming language using emojis for common programming constructs like variables, loops, and conditionals.
+It's currently written in Python which will be terribly slow but I wanted/E to create a quick prototype before deciding if I wanted to sink weeks into creating it in C 😮‍💨.
 
 ## Table of Contents
 - [Features](#features)
@@ -23,24 +23,24 @@ It's currently written in Python which will be terribly slow but I wanted to cre
 - 🗣️ Built-in `print` functionality
 
 ## Installation
-To run EmoLang, you’ll need Python 3.6+ installed on your machine. You can clone this repository and run the interpreter directly.
+To run Mojilang, you’ll need Python 3.6+ installed on your machine. You can clone this repository and run the interpreter directly.
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/abadhikari/EmoLang.git
+   git clone https://github.com/abadhikari/Mojilang.git
    ```
 
 ## Usage
-To run an EmoLang program, follow these steps:
+To run an Mojilang program, follow these steps:
 
-1. Write your EmoLang code in a `.emo` file using the emoji-based syntax.
+1. Write your Mojilang code in a `.moji` file using the emoji-based syntax.
 
-2. Run the interpreter on your `.emo` file using the following command from the project root directory:
+2. Run the interpreter on your `.moji` file using the following command from the project root directory:
    ```bash
-   python -m emolang.main path/to/your/file.emo
+   python -m main.py path/to/your/file.moji
 
 ## Syntax
-EmoLang uses emojis to represent common programming constructs. Below is an overview of the syntax:
+Mojilang uses emojis to represent common programming constructs. Below is an overview of the syntax:
 
 1. **Variables**
  
@@ -92,7 +92,7 @@ Here's an example utilizing several constructs from above:
 ```
 
 ## How It Works
-EmoLang consists of three main components: the lexer, parser, and interpreter.
+Mojilang consists of three main components: the lexer, parser, and interpreter.
 
 **Lexer**: Converts the raw source code into tokens.
 **Parser**: Takes the tokens and organizes them into an Abstract Syntax Tree (AST) using the rescursive descent parsing algorithm.
@@ -114,7 +114,7 @@ This is converted by the lexer into the following tokens:
 * SEMI_COLON (;)
 
 ### Parser
-The parser takes the tokens produced by the lexer and organizes them into an Abstract Syntax Tree (AST). The AST is a hierarchical structure that represents the syntactical structure of the EmoLang program.
+The parser takes the tokens produced by the lexer and organizes them into an Abstract Syntax Tree (AST). The AST is a hierarchical structure that represents the syntactical structure of the Mojilang program.
 
 For example:
 
@@ -148,7 +148,7 @@ The interpreter will:
 
 1. Evaluate 10 + 20 and assign the result (30) to x.
 1. Print the value of x to the console (resulting in 30 being displayed).
-The interpreter handles all the logic and operations defined by EmoLang, such as variable assignments, conditionals, loops, and function calls (these are still in-progress).
+The interpreter handles all the logic and operations defined by Mojilang, such as variable assignments, conditionals, loops, and function calls (these are still in-progress).
 
 ## License
 This project is licensed under the MIT License - see the LICENSE file for details.
