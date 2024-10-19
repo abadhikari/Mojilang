@@ -1,7 +1,7 @@
 # EmoLang 👻
 
-EmoLang is a simple programming language that utilizes emojis and is built from scratch with a custom lexer, parser, and interpreter. 
-My goal with EmoLang was to learn the basic inner workings of a programming language and also make a fun goofy programming language using silly emojis for common programming constructs like variables, loops, and conditionals.
+EmoLang (EmojiLanguage 😉) is a simple programming language that utilizes emojis and is built from scratch with a custom lexer, parser, and interpreter. 
+My goal with EmoLang was to learn the basic inner workings of a programming language while also making a fun goofy programming language using emojis for common programming constructs like variables, loops, and conditionals.
 It's currently written in Python which will be terribly slow but I wanted to create a quick prototype before deciding if I wanted to sink weeks into creating it in C 😮‍💨.
 
 ## Table of Contents
@@ -57,7 +57,7 @@ The 🗣️ emoji is used for printing output:
 
 3. **If Statements**
 
-The 🤔 emoji is used for if statements, 🙈 is used for if else, 💅 is used for else, 😤 is the equivalent of true.
+The 🤔 emoji is used for if statements, 🙈 is used for else if, 💅 is used for else, 😤 is the equivalent of true while 😔 is the equivalent of false. 
 ```
 🤔(😤) {
     🗣️("This is true.");
@@ -67,7 +67,7 @@ The 🤔 emoji is used for if statements, 🙈 is used for if else, 💅 is used
 ```
 
 4. **Loops**
-The 🔁 emoji is used for loops.
+The 🔁 emoji is used for loops, 💥 is for break, and 🤓 is for continue. 
 ```
 🥸 i ✍️ 10;
 🔁(i ☝️ 0) {
