@@ -17,7 +17,7 @@ class BlockNode(AbstractSyntaxTreeNode):
             return_value = node.evaluate(context)
             if isinstance(node, ReturnNode):
                 return return_value
-            if (isinstance(return_value, BreakNode) or isinstance(return_value, ContinueNode)) and self._scope == BlockScope.LOOP:
+            if (isinstance(return_value, BreakNode) or isinstance(return_value, ContinueNode)) and self._scope.within_block_scope(BlockScope.LOOP):
                 return return_value
         return return_value
 
