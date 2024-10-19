@@ -1,4 +1,4 @@
-from emolang import Parser, Interpreter, Lexer
+from mojilang import Parser, Interpreter, Lexer
 
 
 def run_interpreter_and_retrieve_output(source_code, capsys):

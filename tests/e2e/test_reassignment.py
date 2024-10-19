@@ -1,4 +1,4 @@
-from emolang.lexer import SyntaxException
+from mojilang.lexer import SyntaxException
 from tests.e2e.utils.run_interpreter import run_interpreter_and_retrieve_output
 
 
@@ -34,7 +34,7 @@ def test_reassignment_without_initial_declaration(capsys):
         run_interpreter_and_retrieve_output(source_code, capsys)
         assert False, "Expected RuntimeException for undeclared variable."
     except RuntimeError as e:
-        assert str(e) == "Execution error: line 2, Emolang Runtime Error: Variable has not been declared yet."
+        assert str(e) == "Execution error: line 2, mojilang Runtime Error: Variable has not been declared yet."
 
 
 def test_multiple_reassignments(capsys):

@@ -1,4 +1,4 @@
-from emolang.lexer import Lexer, TokenType
+from mojilang.lexer import Lexer, TokenType
 
 
 class TestLexer:

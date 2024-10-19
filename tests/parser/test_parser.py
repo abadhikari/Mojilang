@@ -1,7 +1,7 @@
 import pytest
-from emolang.lexer import Lexer, SyntaxException
-from emolang.parser import Parser
-from emolang.parser.nodes import (
+from mojilang.lexer import Lexer, SyntaxException
+from mojilang.parser import Parser
+from mojilang.parser.nodes import (
     AdditionNode,
     AssignmentNode,
     AndNode,
