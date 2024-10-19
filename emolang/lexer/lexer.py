@@ -77,6 +77,10 @@ class Lexer:
             self._add_token(TokenType.GREATER_EQUAL if self._match('🤝') else TokenType.GREATER)
         elif character == '🖊':
             self._add_token(TokenType.INPUT)
+        elif character == '💥':
+            self._add_token(TokenType.BREAK)
+        elif character == '🤓':
+            self._add_token(TokenType.CONTINUE)
         elif character == '🫡':
             self._add_token(TokenType.RETURN)
         elif character == '🛠':

@@ -8,8 +8,9 @@ from .input_node import InputNode
 from .print_node import PrintNode
 from .return_node import ReturnNode
 from .variable_node import VariableNode
+from .block_scope import BlockScope
 
-from .control import IfNode, ElseIfNode, ElseNode, NotNode, ConditionalNode, LoopNode
+from .control import IfNode, ElseIfNode, ElseNode, NotNode, ConditionalNode, LoopNode, BreakNode, ContinueNode
 from .literal import LiteralNode, NumberLiteralNode, StringLiteralNode, BooleanLiteralNode
 from .operation import (
     AdditionNode,
@@ -68,5 +69,8 @@ __all__ = [
     'BooleanLiteralNode',
     'UnaryOperationContext',
     'ReassignmentNode',
-    'LoopNode'
+    'LoopNode',
+    'BlockScope',
+    'BreakNode',
+    'ContinueNode'
 ]

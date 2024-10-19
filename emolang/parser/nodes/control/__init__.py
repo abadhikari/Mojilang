@@ -4,6 +4,8 @@ from .else_node import ElseNode
 from .not_node import NotNode
 from .conditional_node import ConditionalNode
 from .loop_node import LoopNode
+from .break_node import BreakNode
+from .continue_node import ContinueNode
 
 
 __all__ = [
@@ -12,5 +14,7 @@ __all__ = [
     'ElseNode',
     'NotNode',
     'ConditionalNode',
-    'LoopNode'
+    'LoopNode',
+    'BreakNode',
+    'ContinueNode'
 ]

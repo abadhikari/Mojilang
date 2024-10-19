@@ -1,4 +1,6 @@
 from emolang.parser.nodes.abstract_syntax_tree_node import AbstractSyntaxTreeNode
+from emolang.parser.nodes.control.break_node import BreakNode
+from emolang.parser.nodes.control.continue_node import ContinueNode
 
 
 class LoopNode(AbstractSyntaxTreeNode):
@@ -11,4 +13,8 @@ class LoopNode(AbstractSyntaxTreeNode):
         value = None
         while self._condition_node.evaluate(context):
             value = self._block_node.evaluate(context)
+            if isinstance(value, BreakNode):
+                break
+            if isinstance(value, ContinueNode):
+                continue
         return value

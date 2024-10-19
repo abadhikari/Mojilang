@@ -53,6 +53,8 @@ class TokenType(Enum):
     TRUE = 'TRUE'
     VAR = 'VAR'
     FUNCTION = 'FUNCTION'
+    BREAK = 'BREAK'
+    CONTINUE = 'CONTINUE'
 
     EOF = 'EOF'
 

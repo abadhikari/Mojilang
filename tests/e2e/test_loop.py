@@ -32,3 +32,37 @@ def test_while_loop_zero_iterations(capsys):
     expected_output = "Loop ended.\n"
     captured = run_interpreter_and_retrieve_output(source_code, capsys)
     assert captured.out == expected_output
+
+
+def test_break_in_loop(capsys):
+    source_code = """
+    🥸 i ✍️ 5;
+    🔁(i ☝️ 0) {
+        🗣️(i);
+        🤔(i 🤝 3) {
+            💥;
+        }
+        i ✍️ i ➖ 1;
+    }
+    🗣️("Loop exited.");
+    """
+    expected_output = "5.0\n4.0\n3.0\nLoop exited.\n"
+    captured = run_interpreter_and_retrieve_output(source_code, capsys)
+    assert captured.out == expected_output
+
+
+def test_continue_for_even_numbers_in_loop(capsys):
+    source_code = """
+    🥸 i ✍️ 6;
+    🔁(i ☝️ 0) {
+        i ✍️ i ➖ 1;
+        🤔(i 🍕 2 🤝 0) {
+            🤓;
+        }
+        🗣️(i);
+    }
+    🗣️("Loop completed.");
+    """
+    expected_output = "5.0\n3.0\n1.0\nLoop completed.\n"
+    captured = run_interpreter_and_retrieve_output(source_code, capsys)
+    assert captured.out == expected_output

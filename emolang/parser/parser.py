@@ -28,7 +28,10 @@ from emolang.parser.nodes import (
     BooleanLiteralNode,
     UnaryOperationContext,
     ReassignmentNode,
-    LoopNode
+    LoopNode,
+    BlockScope,
+    BreakNode,
+    ContinueNode
 )
 
 
@@ -47,6 +50,7 @@ class Parser:
         """
         self._tokens = tokens
         self._current = 0
+        self._block_scope = BlockScope.DEFAULT
 
     def parse(self):
         """
@@ -60,7 +64,7 @@ class Parser:
         while self._in_bounds(self._current) and not self._is_eof_token():
             node = self._handle_token()
             nodes.append(node)
-        return BlockNode(nodes, line_number)
+        return BlockNode(nodes, self._block_scope, line_number)
 
     def _current_line_number(self):
         """
@@ -118,6 +122,10 @@ class Parser:
             return self._parse_var_token()
         if token.is_token_type(TokenType.IF):
             return self._parse_if_statement()
+        if token.is_token_type(TokenType.BREAK):
+            return self._parse_break()
+        if token.is_token_type(TokenType.CONTINUE):
+            return self._parse_continue()
         if token.is_token_type(TokenType.LOOP):
             return self._parse_loop()
         if token.get_token_type() in TokenType.literal_types():
@@ -445,7 +453,7 @@ class Parser:
                 raise SyntaxException(self._current_token().get_line(), "Missing closing right brace.")
             node = self._handle_token()
             nodes.append(node)
-        return BlockNode(nodes, line_number)
+        return BlockNode(nodes, self._block_scope, line_number)
 
     def _parse_next_if_conditional(self):
         """
@@ -476,17 +484,42 @@ class Parser:
             self._validate_token({TokenType.RIGHT_BRACE}, "Expected '}' to begin else block.")
             return ElseNode(else_block_node, line_number)
 
+    def _parse_break(self):
+        """
+        Parses a break statement in the source code which is used to exit a loop prematurely.
+
+        :return: A BreakNode representing the break.
+        :raise: SyntaxException if the '💥' token or the terminating semicolon is missing.
+        """
+        line_number = self._validate_token({TokenType.BREAK}, "Expected '💥' for break.")
+        self._validate_token({TokenType.SEMI_COLON}, "Expected ';' to terminate statement.")
+        return BreakNode(line_number)
+
+    def _parse_continue(self):
+        """
+        Parses a continue statement in the source code which is used to skip the rest of the current loop.
+
+        :return: A ContinueNode representing the continue.
+        :raise: SyntaxException if the '🤓' token or the terminating semicolon is missing.
+        """
+        line_number = self._validate_token({TokenType.CONTINUE}, "Expected '🤓' for continue.")
+        self._validate_token({TokenType.SEMI_COLON}, "Expected ';' to terminate statement.")
+        return ContinueNode(line_number)
+
     def _parse_loop(self):
         """
         Parses a loop in the source code.
 
         :return: An LoopNode representing the parsed loop.
         """
+        previous_block_scope = self._block_scope
+        self._block_scope = BlockScope.LOOP
         line_number = self._validate_token({TokenType.LOOP}, "Expected '🔁' for loop.")
         condition_node = self._parse_expression()
         self._validate_token({TokenType.LEFT_BRACE}, "Expected '{' to begin if statement block.")
         loop_block_node = self._parse_block()
         self._validate_token({TokenType.RIGHT_BRACE}, "Expected '}' to begin if statement block.")
+        self._block_scope = previous_block_scope
         return LoopNode(condition_node, loop_block_node, line_number)
 
     def _parse_literal(self, token):
