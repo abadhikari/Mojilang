@@ -99,6 +99,7 @@ class ScopeContext:
 
         This is used to create a new local scope (such as for function calls) while preserving access to global variables.
 
+        :param block_scope: The block_scope of the new context.
         :return: A new ScopeContext with a separate local scope but shared global context.
         """
         new_block_scope_context = self._block_scope_context.enter_scope(block_scope)
@@ -111,17 +112,6 @@ class ScopeContext:
     def within_block_scope(self, block_scope):
         """Checks if a specific scope type is present in the scope chain."""
         return self._block_scope_context.within_block_scope(block_scope)
-
-    def update_block_scope_context(self, new_block_scope_context):
-        """
-        Change the active block scope context to a new one during execution.
-
-        :param new_block_scope_context: The new block scope context to be set as the active context.
-        :return: The previous block scope context before the update.
-        """
-        previous_block_scope_context = self._block_scope_context
-        self._block_scope_context = new_block_scope_context
-        return previous_block_scope_context
 
     def __repr__(self):
         return f'local_context: {self._local_context}, global_context: {self._global_context}, block_scope_context: {self._block_scope_context}'

@@ -1,6 +1,6 @@
 # Mojilang 👻
 
-Mojilang (EmojiLanguage 😉) is a simple programming language that utilizes emojis and is built from scratch with a custom lexer, parser, and interpreter. 
+Mojilang (EmojiLanguage 😉) is a simple interpreted programming language that utilizes emojis and is built from scratch with a custom lexer, parser, and interpreter. 
 My goal with Mojilang was to learn the basic inner workings of a programming language while also making a fun goofy programming language using emojis for common programming constructs like variables, loops, and conditionals.
 It's currently written in Python which will be terribly slow but I wanted/E to create a quick prototype before deciding if I wanted to sink weeks into creating it in C 😮‍💨.
 
@@ -37,7 +37,7 @@ To run an Mojilang program, follow these steps:
 
 2. Run the interpreter on your `.moji` file using the following command from the project root directory:
    ```bash
-   python -m main.py path/to/your/file.moji
+   python -m mojilang.mojilang path/to/your/file.moji
 
 ## Syntax
 Mojilang uses emojis to represent common programming constructs. Below is an overview of the syntax:
