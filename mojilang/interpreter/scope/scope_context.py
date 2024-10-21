@@ -93,7 +93,7 @@ class ScopeContext:
             variable_name in self._global_context
         )
 
-    def create_new_scope_context(self):
+    def create_new_scope_context(self, block_scope):
         """
         Creates a new local ScopeContext that shares the global context with the current one.
 
@@ -101,11 +101,16 @@ class ScopeContext:
 
         :return: A new ScopeContext with a separate local scope but shared global context.
         """
-        return ScopeContext(block_scope_context=self._block_scope_context, global_context=self._global_context, parent_context=self)
+        new_block_scope_context = self._block_scope_context.enter_scope(block_scope)
+        return ScopeContext(block_scope_context=new_block_scope_context, global_context=self._global_context, parent_context=self)
 
     def is_block_scope(self, block_scope):
         """Returns if the current block scope is the expected one."""
         return self._block_scope_context.is_block_scope(block_scope)
+
+    def within_block_scope(self, block_scope):
+        """Checks if a specific scope type is present in the scope chain."""
+        return self._block_scope_context.within_block_scope(block_scope)
 
     def update_block_scope_context(self, new_block_scope_context):
         """

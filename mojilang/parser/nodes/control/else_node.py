@@ -1,3 +1,4 @@
+from mojilang.interpreter.scope import BlockScope
 from mojilang.parser.nodes.abstract_syntax_tree_node import AbstractSyntaxTreeNode
 
 
@@ -7,4 +8,5 @@ class ElseNode(AbstractSyntaxTreeNode):
         self._block_node = block_node
 
     def evaluate(self, context):
-        return self._block_node.evaluate(context)
+        new_context = context.create_new_scope_context(BlockScope.CONDITIONAL)
+        return self._block_node.evaluate(new_context)

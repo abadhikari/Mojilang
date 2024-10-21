@@ -1,3 +1,4 @@
+from mojilang.interpreter.scope import BlockScope
 from mojilang.parser.nodes.abstract_syntax_tree_node import AbstractSyntaxTreeNode
 from mojilang.parser.nodes.control.break_node import BreakNode
 from mojilang.parser.nodes.control.continue_node import ContinueNode
@@ -12,7 +13,7 @@ class LoopNode(AbstractSyntaxTreeNode):
     def evaluate(self, context):
         value = None
         while self._condition_node.evaluate(context):
-            new_context = context.create_new_scope_context()
+            new_context = context.create_new_scope_context(BlockScope.LOOP)
             value = self._block_node.evaluate(new_context)
             if isinstance(value, BreakNode):
                 break

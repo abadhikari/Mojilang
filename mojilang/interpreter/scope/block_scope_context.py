@@ -1,4 +1,4 @@
-from mojilang.parser.scope.block_scope import BlockScope
+from mojilang.interpreter.scope.block_scope import BlockScope
 
 
 class BlockScopeContext:

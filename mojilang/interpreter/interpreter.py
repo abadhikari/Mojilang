@@ -1,6 +1,6 @@
-from mojilang.interpreter.scope_context import ScopeContext
-from mojilang.parser.scope import BlockScopeContext
-from mojilang.parser.scope import BlockScope
+from mojilang.interpreter.scope.scope_context import ScopeContext
+from mojilang.interpreter.scope import BlockScopeContext
+from mojilang.interpreter.scope import BlockScope
 
 
 class Interpreter:

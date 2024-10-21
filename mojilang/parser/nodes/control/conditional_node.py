@@ -1,3 +1,4 @@
+from mojilang.interpreter.scope import BlockScope
 from mojilang.parser.nodes.abstract_syntax_tree_node import AbstractSyntaxTreeNode
 
 
@@ -32,7 +33,8 @@ class ConditionalNode(AbstractSyntaxTreeNode):
                  conditional node's evaluation if the condition is false. Returns None if no conditions match.
         """
         if self._condition_node.evaluate(context):
-            return self._block_node.evaluate(context)
+            new_context = context.create_new_scope_context(BlockScope.CONDITIONAL)
+            return self._block_node.evaluate(new_context)
         else:
             if self._next_conditional_node:
                 return self._next_conditional_node.evaluate(context)

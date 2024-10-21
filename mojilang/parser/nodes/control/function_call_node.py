@@ -1,3 +1,4 @@
+from mojilang.interpreter.scope import BlockScope
 from mojilang.parser.nodes.abstract_syntax_tree_node import AbstractSyntaxTreeNode
 
 
@@ -10,4 +11,5 @@ class FunctionCallNode(AbstractSyntaxTreeNode):
     def evaluate(self, context):
         function = context.retrieve_variable_value(self._function_name)
         evaluated_args = [argument.evaluate(context) for argument in self._arguments]
-        return function.call(context, evaluated_args)
+        new_context = context.create_new_scope_context(BlockScope.FUNCTION)
+        return function.call(new_context, evaluated_args)
