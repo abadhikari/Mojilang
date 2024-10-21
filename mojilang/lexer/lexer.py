@@ -25,6 +25,9 @@ class Lexer:
         self._current = 0
         self._line = 1
 
+        self._special_identifier_characters = {'_'}
+        self._ignore_characters = {' ', '\r', '\t', '\n', '\u200B', '\uFE0F'}
+
     def scan_tokens(self):
         """
         Scans the source code and generates a list of tokens.
@@ -38,6 +41,7 @@ class Lexer:
 
         end_of_file_token = Token(TokenType.EOF, "", None, self._line)
         self._tokens.append(end_of_file_token)
+        return self._exceptions
 
     def _is_at_end(self):
         """
@@ -116,7 +120,7 @@ class Lexer:
         elif character == '🧐':
             while self._peek() != '\n' and not self._is_at_end():
                 self._advance()
-        elif character in [' ', '\r', '\t', '\n']:
+        elif character in self._ignore_characters:
             if character == '\n':
                 self._line += 1
         elif character == '"':
@@ -124,7 +128,7 @@ class Lexer:
         else:
             if character.isdigit():
                 self._number()
-            elif character.isalnum():
+            elif self._is_valid_identifier_character(character):
                 if self._peek_next(2) == 'and':
                     self._current += 2
                     self._add_token(TokenType.AND)
@@ -134,7 +138,7 @@ class Lexer:
                 else:
                     self._identifier()
             else:
-                unexpected_character_exception = SyntaxException(self._line, "Unexpected character.")
+                unexpected_character_exception = SyntaxException(self._line, f"Unexpected character [{character}]")
                 self._exceptions.append(unexpected_character_exception)
 
     def _advance(self):
@@ -203,9 +207,7 @@ class Lexer:
         self._add_token(TokenType.STRING, value)
 
     def _number(self):
-        """
-        Scans a numeric literal, handling integers and floating-point numbers.
-        """
+        """Scans a numeric literal, handling integers and floating-point numbers."""
         while self._peek().isdigit():
             self._advance()
 
@@ -230,12 +232,14 @@ class Lexer:
         return self._source[self._start:next_index]
 
     def _identifier(self):
-        """
-        Scans an identifier (variable name or keyword) from the source code.
-        """
-        while self._peek().isalnum():
+        """Scans an identifier (variable name or keyword) from the source code."""
+        while self._is_valid_identifier_character(self._peek()):
             self._advance()
         self._add_token(TokenType.IDENTIFIER)
+
+    def _is_valid_identifier_character(self, character):
+        """Determines if a character is alphanumeric or a valid special character for identifiers (variables names)."""
+        return character.isalnum() or character in self._special_identifier_characters
 
     def get_tokens(self):
         """

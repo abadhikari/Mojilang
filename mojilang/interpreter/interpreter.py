@@ -1,4 +1,6 @@
 from mojilang.interpreter.scope_context import ScopeContext
+from mojilang.parser.scope import BlockScopeContext
+from mojilang.parser.scope import BlockScope
 
 
 class Interpreter:
@@ -15,7 +17,7 @@ class Interpreter:
         :param abstract_syntax_tree: The AST to be executed. This represents the parsed structure of the program.
         """
         self._abstract_syntax_tree = abstract_syntax_tree
-        self._context = ScopeContext()
+        self._context = ScopeContext(BlockScopeContext(BlockScope.GLOBAL))
 
     def execute(self):
         """

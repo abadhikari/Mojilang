@@ -66,3 +66,18 @@ def test_continue_for_even_numbers_in_loop(capsys):
     expected_output = "5.0\n3.0\n1.0\nLoop completed.\n"
     captured = run_interpreter_and_retrieve_output(source_code, capsys)
     assert captured.out == expected_output
+
+
+def test_assign_variable_inside_loop(capsys):
+    source_code = """
+    🥸 i ✍️ 3;
+    🔁(i ☝️ 0) {
+        🥸 new_var ✍️ i ➕ 10;
+        🗣️(new_var);
+        i ✍️ i ➖ 1;
+    }
+    🗣️("Loop completed.");
+    """
+    expected_output = "13.0\n12.0\n11.0\nLoop completed.\n"
+    captured = run_interpreter_and_retrieve_output(source_code, capsys)
+    assert captured.out == expected_output

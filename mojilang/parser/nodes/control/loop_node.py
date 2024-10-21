@@ -12,7 +12,8 @@ class LoopNode(AbstractSyntaxTreeNode):
     def evaluate(self, context):
         value = None
         while self._condition_node.evaluate(context):
-            value = self._block_node.evaluate(context)
+            new_context = context.create_new_scope_context()
+            value = self._block_node.evaluate(new_context)
             if isinstance(value, BreakNode):
                 break
             if isinstance(value, ContinueNode):

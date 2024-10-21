@@ -11,4 +11,4 @@ class ReassignmentNode(AssignmentNode):
         variable_name = self._variable_node.get_name()
         if not context.contains_variable(variable_name):
             raise RuntimeException("Variable has not been declared yet.", self.get_line_number())
-        context.assign_value(self._variable_node.get_name(), new_value)
+        context.reassign_value(self._variable_node.get_name(), new_value)

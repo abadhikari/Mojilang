@@ -1,0 +1,11 @@
+🥸 i ✍️ 2;
+🔁(i ☝️ 0) {
+    🥸 inner_i ✍️ 5;
+    🗣️(inner_i);
+    🔁(inner_i ☝️ 0) {
+        🥸 nested_var ✍️ inner_i ➕ i;
+        🗣️(nested_var);
+        inner_i ✍️ inner_i ➖ 1;
+    }
+    i ✍️ i ➖ 1;
+}
