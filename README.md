@@ -77,7 +77,17 @@ The 🔁 emoji is used for loops, 💥 is for break, and 🤓 is for continue.
 🗣️("Blast off!");
 ```
 
-5. **Example**
+5. **Functions**
+The 🛠️ emoji is used for functions, 🥸 is used for the parameters, 🫡 is used for return, and 👀 is used to call the function. 
+```
+🛠 sum(🥸 num1, 🥸 num2) {
+  🫡 num1 ➕ num2;
+}
+
+🗣️(👀sum(1, 2) ➕ 2);
+```
+
+## Example ##
 
 Here's an example utilizing several constructs from above:
 ```
