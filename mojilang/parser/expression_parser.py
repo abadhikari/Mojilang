@@ -28,28 +28,32 @@ class ExpressionParser:
         self._parser = parser
         self._state = parser.get_state()
 
-    def parse(self):
+    def parse(self, end_tokens=None):
         """
         Parses an expression up to the specified end token (such as a semicolon or a right brace).
 
+        :param: end_tokens: optional tokens that the expression end on. Used to exit early.
         :return: The root node of the parsed expression.
         """
-        end_of_expression_index = self._find_end_of_expression_index()
+        if end_tokens is None:
+            end_tokens = {}
+        end_of_expression_index = self._find_end_of_expression_index(end_tokens)
         node = self._parse_expression_recursive(self._state.get_current(), end_of_expression_index - 1)
         self._state.set_current(end_of_expression_index)
         return node
 
-    def _find_end_of_expression_index(self):
+    def _find_end_of_expression_index(self, end_tokens):
         """
         Finds the index of the end of the expression specified token (such as a semicolon).
         This is done by iterating until it encounters a token that shouldn't be found in
         an expression.
 
+        :param: end_tokens: tokens that the expression end on. Used to exit early.
         :return: The index of the end of expression.
         """
         index = self._state.get_current()
         valid_expression_tokens = TokenType.valid_expression_types()
-        while self._state.retrieve_token(index).get_token_type() in valid_expression_tokens:
+        while not self._state.retrieve_token(index).get_token_type() in end_tokens and (self._state.retrieve_token(index).get_token_type() in valid_expression_tokens):
             index += 1
         return index
 
@@ -78,7 +82,8 @@ class ExpressionParser:
             {TokenType.BANG},
             {TokenType.MINUS, TokenType.PLUS},
             {TokenType.MULTIPLY, TokenType.DIVIDE, TokenType.MODULUS},
-            {TokenType.EXPONENT}
+            {TokenType.EXPONENT},
+            {TokenType.FUNCTION_CALL}
         ]
         for operators in operator_precedence:
             index = left_index
@@ -86,6 +91,10 @@ class ExpressionParser:
                 token = self._state.retrieve_token(index)
                 if token.is_token_type(TokenType.LEFT_PAREN):
                     index = self._skip_parentheses(index, right_index)
+                if token.is_token_type(TokenType.FUNCTION_CALL):
+                    expected_index = self._skip_function_call(index, right_index)
+                    if expected_index != right_index:
+                        index = expected_index
                 node = self._handle_by_operations(operators, left_index, right_index, index)
                 if node:
                     return node
@@ -164,6 +173,16 @@ class ExpressionParser:
         paren_counter, end_index = self._find_parenthesis_count(left_index, right_index)
         return min(end_index + 1, right_index)
 
+    def _skip_function_call(self, left_index, right_index):
+        """
+        Skips over a section of tokens that correspond to a function call.
+
+        :param left_index: The starting index (left parenthesis).
+        :param right_index: The ending index.
+        :return: The index of the token after the closing parenthesis of the function call.
+        """
+        return self._skip_parentheses(left_index + 2, right_index)
+
     def _handle_by_operations(self, operations, left_index, right_index, index):
         """
         Handles binary and unary operations based on operator precedence.
@@ -177,10 +196,22 @@ class ExpressionParser:
         token = self._state.retrieve_token(index)
         token_type = token.get_token_type()
         if token_type in operations:
-            if token_type in TokenType.unary_operations():
+            if token_type == TokenType.FUNCTION_CALL:
+                return self._handle_function_call(index)
+            elif token_type in TokenType.unary_operations():
                 return self._handle_unary_operation(index, right_index)
             else:
                 return self._handle_binary_operation(left_index, index, right_index)
+
+    def _handle_function_call(self, index):
+        """
+        Handles parsing function calls in the expression.
+
+        :param index: The index of the unary operator.
+        :return: Node representing the function call.
+        """
+        self._state.set_current(index)
+        return self._parser.handle_token()
 
     def _handle_unary_operation(self, index, right_index):
         """

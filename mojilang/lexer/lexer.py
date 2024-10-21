@@ -69,6 +69,10 @@ class Lexer:
             self._add_token(TokenType.RIGHT_BRACE)
         elif character == ';':
             self._add_token(TokenType.SEMI_COLON)
+        elif character == ',':
+            self._add_token(TokenType.COMMA)
+        elif character == '.':
+            self._add_token(TokenType.PERIOD)
         elif character == '✍':
             self._add_token(TokenType.EQUAL)
         elif character == '🤝':
@@ -89,6 +93,8 @@ class Lexer:
             self._add_token(TokenType.RETURN)
         elif character == '🛠':
             self._add_token(TokenType.FUNCTION)
+        elif character == '👀':
+            self._add_token(TokenType.FUNCTION_CALL)
         elif character == '😤':
             self._add_token(TokenType.TRUE)
         elif character == '😔':

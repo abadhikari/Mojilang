@@ -6,6 +6,9 @@ from .conditional_node import ConditionalNode
 from .loop_node import LoopNode
 from .break_node import BreakNode
 from .continue_node import ContinueNode
+from .function_node import FunctionNode
+from .function_call_node import FunctionCallNode
+from .return_node import ReturnNode
 
 
 __all__ = [
@@ -16,5 +19,8 @@ __all__ = [
     'ConditionalNode',
     'LoopNode',
     'BreakNode',
-    'ContinueNode'
+    'ContinueNode',
+    'FunctionNode',
+    'FunctionCallNode',
+    'ReturnNode'
 ]

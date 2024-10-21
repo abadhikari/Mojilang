@@ -1,5 +1,5 @@
 from mojilang.parser.nodes.abstract_syntax_tree_node import AbstractSyntaxTreeNode
-from mojilang.parser.nodes.return_node import ReturnNode
+from mojilang.parser.nodes.control.return_node import ReturnNode
 from mojilang.parser.nodes.control.break_node import BreakNode
 from mojilang.parser.nodes.control.continue_node import ContinueNode
 from mojilang.parser.scope.block_scope import BlockScope
@@ -13,7 +13,7 @@ class BlockNode(AbstractSyntaxTreeNode):
 
     def evaluate(self, context):
         previous_block_scope_context = context.update_block_scope_context(self._block_scope_context)
-        new_context = self._handle_context(context)
+        new_context = self._determine_scope_context(context)
         try:
             return_value = None
             for node in self._nodes:
@@ -26,7 +26,7 @@ class BlockNode(AbstractSyntaxTreeNode):
         finally:
             context.update_block_scope_context(previous_block_scope_context)
 
-    def _handle_context(self, context):
+    def _determine_scope_context(self, context):
         return context if context.is_block_scope(BlockScope.LOOP) or context.is_block_scope(BlockScope.GLOBAL) else context.create_new_scope_context()
 
     def get_nodes(self):

@@ -3,7 +3,7 @@ from mojilang.parser import Parser
 from mojilang.interpreter import Interpreter
 from mojilang.lexer import SyntaxException
 
-with open('mojilang/mojilang_files/loop2.moji') as f:
+with open('mojilang/mojilang_files/function.moji') as f:
     s = f.read()
     moji_lexer = Lexer(s)
     exceptions = moji_lexer.scan_tokens()

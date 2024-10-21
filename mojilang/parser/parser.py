@@ -13,7 +13,10 @@ from mojilang.parser.nodes import (
     ReassignmentNode,
     LoopNode,
     BreakNode,
-    ContinueNode
+    ContinueNode,
+    FunctionNode,
+    ReturnNode,
+    FunctionCallNode
 )
 from mojilang.parser.parser_state import ParserState
 from mojilang.parser.scope import BlockScopeContext, BlockScope
@@ -83,6 +86,12 @@ class Parser:
             return self._parse_continue()
         if token.is_token_type(TokenType.LOOP):
             return self._parse_loop()
+        if token.is_token_type(TokenType.FUNCTION):
+            return self._parse_function_declaration()
+        if token.is_token_type(TokenType.RETURN):
+            return self._parse_return()
+        if token.is_token_type(TokenType.FUNCTION_CALL):
+            return self._parse_function_call()
         if token.get_token_type() in TokenType.literal_types():
             return self._parse_literal(token)
         if token.get_token_type() in TokenType.operation_types():
@@ -277,6 +286,103 @@ class Parser:
         loop_block_node = self._parse_block(BlockScope.LOOP)
         self._validate_token({TokenType.RIGHT_BRACE}, "Expected '}' to begin if statement block.")
         return LoopNode(condition_node, loop_block_node, line_number)
+
+    def _parse_function_declaration(self):
+        """
+        Parses a function declaration corresponding to '🛠️' in the source code.
+
+        :return: An FunctionNode representing the parsed function.
+        :raises SyntaxException: If the function declaration is malformed (e.g. missing tokens).
+        """
+        line_number = self._validate_token({TokenType.FUNCTION}, "Expected '🛠️' for function.")
+        function_name = self._parse_function_name()
+        self._validate_token({TokenType.IDENTIFIER}, "Expected an identifier for function declaration.")
+        function_arguments = self._parse_function_argument_names()
+        self._validate_token({TokenType.LEFT_BRACE}, "Expected '{' to begin if statement block.")
+        function_block_node = self._parse_block(BlockScope.FUNCTION)
+        self._validate_token({TokenType.RIGHT_BRACE}, "Expected '}' to begin if statement block.")
+        return FunctionNode(function_name, function_arguments, function_block_node, line_number)
+
+    def _parse_function_name(self):
+        """
+        Parses an identifier token, which represents a function name.
+
+        :return: FunctionNameNode representing the function name.
+        :raises SyntaxException: If the function name is not a valid identifier.
+        """
+        identifier_token = self._state.current_token()
+        return identifier_token.get_lexeme()
+
+    def _parse_function_argument_names(self):
+        """
+        Parses the argument names for a function.
+
+        :return: A list of argument names (as strings) for the function.
+        :raises SyntaxException: If parentheses or arguments are not correctly formatted.
+        """
+        self._validate_token({TokenType.LEFT_PAREN}, "Expected left parenthesis for function declaration.")
+        arguments = []
+        while self._state.current_token().is_token_type(TokenType.VAR):
+            argument = self._parse_function_argument_name()
+            arguments.append(argument)
+        self._validate_token({TokenType.RIGHT_PAREN}, "Expected right parenthesis for function declaration.")
+        return arguments
+
+    def _parse_function_argument_name(self):
+        """
+        Parses an individual function argument.
+
+        :return: A string representing the argument name.
+        :raises SyntaxException: If the argument declaration is malformed.
+        """
+        self._validate_token({TokenType.VAR}, "Expected '🥸' for function argument declaration.")
+        identifier_token = self._state.current_token()
+        self._validate_token({TokenType.IDENTIFIER}, "Expected an identifier for function argument declaration.")
+        if self._state.current_token().is_token_type(TokenType.COMMA):
+            self._validate_token({TokenType.COMMA}, "Expected a comma for function argument declaration.")
+        return identifier_token.get_lexeme()
+
+    def _parse_return(self):
+        """
+        Parses a return statement corresponding to a '🫡' token from a function.
+
+        :return: A ReturnNode representing the return statement and the expression to return.
+        :raises SyntaxException: If the return statement is missing or malformed.
+        """
+        line_number = self._validate_token({TokenType.RETURN}, "Expected '🫡' for a function return.")
+        node_to_return = self._expression_parser.parse()
+        self._validate_token({TokenType.SEMI_COLON}, "Expected ';' to terminate statement.")
+        return ReturnNode(node_to_return, line_number)
+
+    def _parse_function_call(self):
+        """
+        Parses a function call corresponding to '👀' token from the source code.
+
+        :return: A FunctionCallNode representing the function call.
+        :raises SyntaxException: If the function call is malformed.
+        """
+        line_number = self._validate_token({TokenType.FUNCTION_CALL}, "Expected '👀' for a function call.")
+        identifier_token = self._state.current_token()
+        self._validate_token({TokenType.IDENTIFIER}, "Expected an identifier for function call.")
+        arguments = self._parse_function_call_arguments()
+        return FunctionCallNode(identifier_token.get_lexeme(), arguments, line_number)
+
+    def _parse_function_call_arguments(self):
+        """
+        Parses the arguments passed to a function call.
+
+        :return: A list of expression nodes representing the arguments to the function call.
+        :raises SyntaxException: If the argument list is malformed or parentheses are unbalanced.
+        """
+        self._validate_token({TokenType.LEFT_PAREN}, "Expected left parenthesis for function declaration.")
+        arguments = []
+        while not self._state.current_token().is_token_type(TokenType.RIGHT_PAREN):
+            argument_node = self._expression_parser.parse({TokenType.COMMA, TokenType.RIGHT_PAREN})
+            arguments.append(argument_node)
+            if self._state.current_token().is_token_type(TokenType.COMMA):
+                self._validate_token({TokenType.COMMA}, "Expected a comma for function call argument.")
+        self._validate_token({TokenType.RIGHT_PAREN}, "Expected right parenthesis for function call.")
+        return arguments
 
     def _parse_literal(self, token):
         """

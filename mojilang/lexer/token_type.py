@@ -23,6 +23,8 @@ class TokenType(Enum):
     DIVIDE = 'DIVIDE'
     MODULUS = 'MODULUS'
     EXPONENT = 'EXPONENT'
+    COMMA = 'COMMA'
+    PERIOD = 'PERIOD'
 
     # One or two character tokens
     BANG = 'BANG'
@@ -53,6 +55,7 @@ class TokenType(Enum):
     TRUE = 'TRUE'
     VAR = 'VAR'
     FUNCTION = 'FUNCTION'
+    FUNCTION_CALL = 'FUNCTION_CALL'
     BREAK = 'BREAK'
     CONTINUE = 'CONTINUE'
 
@@ -105,7 +108,7 @@ class TokenType(Enum):
 
         :return: A set containing valid token types for expressions.
         """
-        return cls.valid_print_types() | cls.operation_types() | {cls.LEFT_PAREN, cls.RIGHT_PAREN}
+        return cls.valid_print_types() | cls.operation_types() | {cls.LEFT_PAREN, cls.RIGHT_PAREN, cls.COMMA, cls.FUNCTION_CALL}
 
     @classmethod
     def if_statement_tokens(cls):
