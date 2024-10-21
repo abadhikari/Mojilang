@@ -1,0 +1,13 @@
+🛠️ sum(🥸 num1, 🥸 num2) {
+    🫡 num1 + num2;
+}
+
+🛠️ isEqual(🥸 num1, 🥸 num2) {
+    🫡 num1 == num2;
+}
+
+🥸 summed_numbers = 👀sum(3, 2);
+🗣️ summed_numbers;
+
+🥸 are_equal = 👀isEqual(summed_numbers, 5);
+🗣️ are_equal;

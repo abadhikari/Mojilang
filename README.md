@@ -8,8 +8,8 @@ It's currently written in Python which will be terribly slow but I wanted/E to c
 - [Features](#features)
 - [Installation](#installation)
 - [Usage](#usage)
-- [Syntax](#syntax)
-- [Example](#example)
+- [Syntax Overview](#syntax)
+  - [Syntax Rolodex](#syntax-rolodex-)
 - [How It Works](#how-it-works)
   - [Lexer](#lexer)
   - [Parser](#parser)
@@ -20,6 +20,8 @@ It's currently written in Python which will be terribly slow but I wanted/E to c
 - 🙈 Emoji-based syntax
 - 😤 Custom lexer, parser, and interpreter
 - 🦍 Basic programming features: variables, loops, conditionals, and functions
+- 🗿 Proper operation precedence handling
+- 😮‍💨 Block scoping
 - 🗣️ Built-in `print` functionality
 
 ## Installation
@@ -48,12 +50,22 @@ Define variables using the 🥸 emoji, followed by the variable name, the assign
 ```
 🥸 variable ✍️ 5;
 ```
+Can also use '=' instead of ✍️ and it's valid but it's less fun 😩.
+```
+🥸 variable = 5;
+```
 
 2. Print Statements
 The 🗣️ emoji is used for printing output:
 ```
 🗣️("Hello, World!");
 ```
+
+Parentheses are optional in prints so the following will also work:
+```
+🗣️"Hello, World!";
+```
+
 
 3. **If Statements**
 
@@ -67,7 +79,7 @@ The 🤔 emoji is used for if statements, 🙈 is used for else if, 💅 is used
 ```
 
 4. **Loops**
-The 🔁 emoji is used for loops, 💥 is for break, and 🤓 is for continue. 
+The 🔁 emoji is used for loops, 💥 is for break, and 🤓 is for continue, ☝️is for greater ('>' also works).
 ```
 🥸 i ✍️ 10;
 🔁(i ☝️ 0) {
@@ -87,7 +99,7 @@ The 🛠️ emoji is used for functions, 🥸 is used for the parameters, 🫡 i
 🗣️(👀sum(1, 2) ➕ 2);
 ```
 
-## Example ##
+6. **Example**
 
 Here's an example utilizing several constructs from above:
 ```
@@ -101,12 +113,78 @@ Here's an example utilizing several constructs from above:
 }
 ```
 
+### Syntax Rolodex ###
+
+#### Variables: 
+
+| Operation | Emoji | Description |
+|-----------|-------|-------------|
+| variable  | 🥸    | Dynamically typed variable |
+
+#### Math Operators:
+
+| Operation | Emoji/Symbol | Description |
+|-----------|--------------|-------------|
+| add       | ➕ or '+'     | Add two numbers |
+| subtract  | ➖ or '-'     | Subtract two numbers |
+| multiply  | ✖️ or '*'    | Multiply two numbers |
+| divide    | ➗ or '/'     | Divide two numbers |
+| modulus   | 🍕 or  '%'   | Leftover slice (modulus) |
+| exponent  | 🥕 or '^'    | Exponent (caret symbol in some languages) |
+
+#### Control Flow:
+
+| Operation | Emoji/Symbol   | Description                                      |
+|-----------|----------------|--------------------------------------------------|
+| if        | 🤔             | If condition                                     |
+| else      | 💅             | Else condition                                   |
+| true      | 😤             | True value                                       |
+| false     | 😔             | False value                                      |
+| and       | and            | Sticking with English                            |
+| or        | or             | Sticking with English                            |
+| !         | 🙅‍ or '!'     | Not operation                                    |
+| =         | ✍️ or '='      | Assignment                                       |
+| ==        | 🤝 or '=='     | Equals comparison                                |
+| !=        | 🙅‍🤝 or '!='  | Not equals comparison                            |
+| \>        | ☝️ or '>'      | Greater than                                     |
+| <         | 👇  or '<'     | Less than                                        |
+| \>=       | ☝️🤝  or '>='  | Greater than or equal                            |
+| <=        | 👇🤝   or '<=' | Less than or equal                               |
+| loop      | 🔁             | Single loop for both for and while (like Golang) |
+| break     | 💥             | Break out of the loop                            |
+| continue  | 🤓             | Skip to next iteration in the loop              |
+
+
+#### Functions:
+
+| Operation     | Emoji | Description       |
+|---------------|-------|-------------------|
+| function      | 🛠    | Define a function |
+| return        | 🫡    | Return a value    |
+| function call | 👀    | Call a function   |
+
+#### Input/Output:
+
+| Operation | Emoji | Description |
+|-----------|-------|-------------|
+| input     | 🖊    | Take user input |
+| print     | 🗣    | Output a value to the console |
+
+#### Error Handling:
+
+| Operation | Emoji | Description |
+|-----------|-------|-------------|
+| error     | 🤯    | An error occurred |
+| throw     | 🤮    | Throw (up) an error |
+
+#### Comments:
+
+| Operation | Emoji | Description |
+|-----------|-------|-------------|
+| comment   | 🧐    | Add a comment |
+
 ## How It Works
 Mojilang consists of three main components: the lexer, parser, and interpreter.
-
-**Lexer**: Converts the raw source code into tokens.
-**Parser**: Takes the tokens and organizes them into an Abstract Syntax Tree (AST) using the rescursive descent parsing algorithm.
-**Interpreter**: Walks through the AST and executes the program by evaluating each node, handling expressions, statements, etc.
 
 ### Lexer
 The lexer is responsible for converting raw source code into a list of tokens. A token is a logic unit of the code, such as a number, an operator, or a keyword. The lexer scans each character of the source code and converts them into tokens.
@@ -124,7 +202,7 @@ This is converted by the lexer into the following tokens:
 * SEMI_COLON (;)
 
 ### Parser
-The parser takes the tokens produced by the lexer and organizes them into an Abstract Syntax Tree (AST). The AST is a hierarchical structure that represents the syntactical structure of the Mojilang program.
+The parser takes the tokens produced by the lexer and organizes them into an Abstract Syntax Tree (AST) using the rescursive descent parsing algorithm. The AST is a hierarchical structure that represents the syntactical structure of the Mojilang program.
 
 For example:
 

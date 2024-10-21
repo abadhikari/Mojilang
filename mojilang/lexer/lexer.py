@@ -77,12 +77,20 @@ class Lexer:
             self._add_token(TokenType.EQUAL)
         elif character == '🤝':
             self._add_token(TokenType.EQUAL_EQUAL)
+        elif character == '=':
+            self._add_token(TokenType.EQUAL_EQUAL if self._match('=') else TokenType.EQUAL)
         elif character == '🙅':
             self._add_token(TokenType.BANG_EQUAL if self._match('🤝') else TokenType.BANG)
+        elif character == '!':
+            self._add_token(TokenType.BANG_EQUAL if self._match('=') else TokenType.BANG)
+        elif character == '<':
+            self._add_token(TokenType.LESS_EQUAL if self._match('=') else TokenType.LESS)
         elif character == '👇':
             self._add_token(TokenType.LESS_EQUAL if self._match('🤝') else TokenType.LESS)
         elif character == '☝':
             self._add_token(TokenType.GREATER_EQUAL if self._match('🤝') else TokenType.GREATER)
+        elif character == '>':
+            self._add_token(TokenType.GREATER_EQUAL if self._match('=') else TokenType.GREATER)
         elif character == '🖊':
             self._add_token(TokenType.INPUT)
         elif character == '💥':
@@ -111,17 +119,17 @@ class Lexer:
             self._add_token(TokenType.PRINT)
         elif character == '🥸':
             self._add_token(TokenType.VAR)
-        elif character == '➕':
+        elif character == '➕' or character == '+':
             self._add_token(TokenType.PLUS)
-        elif character == '➖':
+        elif character == '➖' or character == '-':
             self._add_token(TokenType.MINUS)
-        elif character == '✖':
+        elif character == '✖' or character == '*':
             self._add_token(TokenType.MULTIPLY)
-        elif character == '➗':
+        elif character == '➗' or character == '/':
             self._add_token(TokenType.DIVIDE)
-        elif character == '🍕':
+        elif character == '🍕' or character == '%':
             self._add_token(TokenType.MODULUS)
-        elif character == '🥕':
+        elif character == '🥕' or character == '^':
             self._add_token(TokenType.EXPONENT)
         elif character == '🧐':
             while self._peek() != '\n' and not self._is_at_end():

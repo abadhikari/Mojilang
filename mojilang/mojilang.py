@@ -62,8 +62,10 @@ def read_source_code(file_path):
             return file.read()
     except FileNotFoundError:
         print(f"Error: File '{file_path}' not found.")
+        sys.exit(1)
     except Exception as e:
         print(f"An error occurred: {e}")
+        sys.exit(1)
 
 
 if __name__ == '__main__':
