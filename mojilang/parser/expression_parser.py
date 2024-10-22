@@ -211,7 +211,7 @@ class ExpressionParser:
         :return: Node representing the function call.
         """
         self._state.set_current(index)
-        return self._parser.handle_token()
+        return self._parser.parse_function_call()
 
     def _handle_unary_operation(self, index, right_index):
         """

@@ -43,6 +43,10 @@ class BlockScopeContext:
         """Returns if the current block scope is global scope."""
         return self.is_block_scope(BlockScope.GLOBAL)
 
+    def is_function_scope(self):
+        """Returns if the current block scope is function scope."""
+        return self.is_block_scope(BlockScope.FUNCTION)
+
     def within_block_scope(self, block_scope):
         """
         Checks if a specific scope type is present in the scope chain.

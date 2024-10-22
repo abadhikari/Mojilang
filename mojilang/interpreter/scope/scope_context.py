@@ -93,6 +93,26 @@ class ScopeContext:
             variable_name in self._global_context
         )
 
+    def current_scope_contains_variable(self, variable_name):
+        """
+        Checks if a variable is defined in the current scope. This is
+        basically checking within the most recent function or global and enables
+        variable shadowing.
+
+        :param variable_name: The name of the variable to check.
+        :return: True if the variable exists in the local scope, False otherwise.
+        """
+        if self.local_contains_variable(variable_name):
+            return True
+
+        if self._block_scope_context.is_function_scope():
+            return False
+
+        if self._parent_context:
+            return self._parent_context.contains_variable(variable_name)
+
+        return variable_name in self._global_context
+
     def create_new_scope_context(self, block_scope):
         """
         Creates a new local ScopeContext that shares the global context with the current one.

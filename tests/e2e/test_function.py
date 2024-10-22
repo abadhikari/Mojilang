@@ -46,3 +46,60 @@ def test_multiple_functions(capsys):
     expected_output = "5.0\n😤\n"
     captured = run_interpreter_and_retrieve_output(source_code, capsys)
     assert captured.out == expected_output
+
+
+def test_function_scope_shadowing(capsys):
+    source_code = """
+    🛠 add_two_to_x() {
+        🥸 x ✍️ 3;
+        🫡 x ➕ 2;
+    }
+
+    🥸 x ✍️ 2;
+    🗣️(x);
+    🗣️(👀add_two_to_x());
+    🗣️(x);
+    """
+    expected_output = "2.0\n5.0\n2.0\n"
+    captured = run_interpreter_and_retrieve_output(source_code, capsys)
+    assert captured.out == expected_output
+
+
+def test_function_incorrect_variable_reassignment(capsys):
+    source_code = """
+    🛠 add_two_to_x() {
+        x ✍️ 3;
+        🫡 x ➕ 2;
+    }
+
+    🥸 x ✍️ 2;
+    🗣️(x);
+    🗣️(👀add_two_to_x());
+    🗣️(x);
+    """
+    try:
+        run_interpreter_and_retrieve_output(source_code, capsys)
+    except RuntimeError as e:
+        assert "line 3, mojilang Runtime Error: Variable has not been declared yet." in str(e)
+
+
+def test_function_closure(capsys):
+    source_code = """
+    🛠 outer_function() {
+        🥸 x = 10;
+        🥸 y = 1;
+        🛠 inner_function() {
+            🥸 x = 20;
+            🗣️ x;
+            🗣️ y;
+        }
+        👀 inner_function();
+        🗣️ x;
+    }
+    🥸 x = 5;
+    🗣️ x;
+    👀 outer_function();
+    """
+    expected_output = "5.0\n20.0\n1.0\n10.0\n"
+    captured = run_interpreter_and_retrieve_output(source_code, capsys)
+    assert captured.out == expected_output

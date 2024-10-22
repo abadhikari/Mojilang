@@ -67,31 +67,42 @@ class Parser:
             index = self._state.get_current()
         token = self._state.retrieve_token(index)
         if token.is_token_type(TokenType.PRINT):
-            return self._parse_print_token()
+            return self._parse_statement(self._parse_print_token())
         if token.is_token_type(TokenType.IDENTIFIER):
             if self._is_reassignment_statement(index):
-                return self._parse_reassignment()
+                return self._parse_statement(self._parse_reassignment())
             return self._parse_identifier_token(index)
         if token.is_token_type(TokenType.VAR):
-            return self._parse_var_token()
+            return self._parse_statement(self._parse_var_token())
         if token.is_token_type(TokenType.IF):
             return self._parse_if_statement()
         if token.is_token_type(TokenType.BREAK):
-            return self._parse_break()
+            return self._parse_statement(self._parse_break())
         if token.is_token_type(TokenType.CONTINUE):
-            return self._parse_continue()
+            return self._parse_statement(self._parse_continue())
         if token.is_token_type(TokenType.LOOP):
             return self._parse_loop()
         if token.is_token_type(TokenType.FUNCTION):
             return self._parse_function_declaration()
         if token.is_token_type(TokenType.RETURN):
-            return self._parse_return()
+            return self._parse_statement(self._parse_return())
         if token.is_token_type(TokenType.FUNCTION_CALL):
-            return self._parse_function_call()
+            return self._parse_statement(self.parse_function_call())
         if token.get_token_type() in TokenType.literal_types():
             return self._parse_literal(token)
         if token.get_token_type() in TokenType.operation_types():
             return self._operation_parser.parse(token, context)
+
+    def _parse_statement(self, node):
+        """
+        Wraps the parsing of the node and ensures the statement ends with a semicolon.
+
+        :param node: The node representing the parsed expression or statement.
+        :return: The node, after verifying that the statement is properly terminated.
+        :raises SyntaxException: If the statement does not end with a semicolon.
+        """
+        self._validate_token({TokenType.SEMI_COLON}, "Expected ';' to terminate the statement.")
+        return node
 
     def _parse_print_token(self):
         """
@@ -102,7 +113,6 @@ class Parser:
         """
         line_number = self._validate_token({TokenType.PRINT}, "Expected '🗣️' for print statement.")
         node_to_print = self._expression_parser.parse()
-        self._validate_token({TokenType.SEMI_COLON}, "Expected ';' to terminate statement.")
         return PrintNode(node_to_print, line_number)
 
     def _validate_token(self, valid_token_types, error_message):
@@ -164,7 +174,6 @@ class Parser:
         line_number = self._validate_token({TokenType.IDENTIFIER}, "Expected an identifier for assignment.")
         self._validate_token({TokenType.EQUAL}, "Expected '✍️' for assignment.")
         value_node = self._expression_parser.parse()
-        self._validate_token({TokenType.SEMI_COLON}, "Expected ';' to terminate the statement.")
         return variable_node, value_node, line_number
 
     def _parse_var_token(self):
@@ -255,7 +264,6 @@ class Parser:
         :raise: SyntaxException if the '💥' token or the terminating semicolon is missing.
         """
         line_number = self._validate_token({TokenType.BREAK}, "Expected '💥' for break.")
-        self._validate_token({TokenType.SEMI_COLON}, "Expected ';' to terminate statement.")
         return BreakNode(line_number)
 
     def _parse_continue(self):
@@ -266,7 +274,6 @@ class Parser:
         :raise: SyntaxException if the '🤓' token or the terminating semicolon is missing.
         """
         line_number = self._validate_token({TokenType.CONTINUE}, "Expected '🤓' for continue.")
-        self._validate_token({TokenType.SEMI_COLON}, "Expected ';' to terminate statement.")
         return ContinueNode(line_number)
 
     def _parse_loop(self):
@@ -346,10 +353,9 @@ class Parser:
         """
         line_number = self._validate_token({TokenType.RETURN}, "Expected '🫡' for a function return.")
         node_to_return = self._expression_parser.parse()
-        self._validate_token({TokenType.SEMI_COLON}, "Expected ';' to terminate statement.")
         return ReturnNode(node_to_return, line_number)
 
-    def _parse_function_call(self):
+    def parse_function_call(self):
         """
         Parses a function call corresponding to '👀' token from the source code.
 

@@ -1,0 +1,14 @@
+🛠 outer_function() {
+    🥸 x = 10;
+    🥸 y = 1;
+    🛠 inner_function() {
+        🥸 x = 20;
+        🗣️ x;
+        🗣️ y;
+    }
+    👀 inner_function();
+    🗣️ x;
+}
+🥸 x = 5;
+🗣️ x;
+👀 outer_function();
