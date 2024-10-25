@@ -1,8 +1,8 @@
 # Mojilang 👻
 
 Mojilang (EmojiLanguage 😉) is a simple interpreted programming language that utilizes emojis and is built from scratch with a custom lexer, parser, and interpreter. 
-My goal with Mojilang was to learn the basic inner workings of a programming language while also making a fun goofy programming language using emojis for common programming constructs like variables, loops, and conditionals.
-It's currently written in Python which will be terribly slow but I wanted/E to create a quick prototype before deciding if I wanted to sink weeks into creating it in C 😮‍💨.
+My goal with Mojilang was to learn the basic inner workings of a programming language while also making a fun goofy programming language using emojis for common programming constructs like variables, loops, conditionals, and functions.
+It's currently written in Python which will be terribly slow but I wanted to create a quick prototype before deciding if I wanted to sink weeks into creating it in C 🥴.
 
 ## Table of Contents
 - [Features](#features)
@@ -21,9 +21,9 @@ It's currently written in Python which will be terribly slow but I wanted/E to c
 - 🙈 Emoji-based syntax
 - 😤 Custom lexer, parser, and interpreter
 - 🦍 Basic programming features: variables, loops, conditionals, and functions
-- 🗿 Proper operation precedence handling
-- 😮‍💨 Block scoping
-- 🗣️ Built-in `print` functionality
+- 🗿 Proper operator precedence handling
+- 🗣 Dynamic scoping
+- 😵‍💫 Recursion
 
 ## Installation
 To run Mojilang, you’ll need Python 3.6+ installed on your machine. You can clone this repository and run the interpreter directly.
@@ -95,7 +95,7 @@ The interpreter will:
 
 1. Evaluate 10 + 20 and assign the result (30) to x.
 1. Print the value of x to the console (resulting in 30 being displayed).
-The interpreter handles all the logic and operations defined by Mojilang, such as variable assignments, conditionals, loops, and function calls (these are still in-progress).
+The interpreter handles all the logic and operations defined by Mojilang, such as variable assignments, conditionals, loops, and function calls.
 
 
 ## Syntax
@@ -151,14 +151,16 @@ The 🔁 emoji is used for loops, 💥 is for break, and 🤓 is for continue, �
 5. **Functions**
 The 🛠️ emoji is used for functions, 🥸 is used for the parameters, 🫡 is used for return, and 👀 is used to call the function. 
 ```
-🛠 sum(🥸 num1, 🥸 num2) {
-  🫡 num1 ➕ num2;
+🛠 fibonacci(🥸 n) {
+    🤔(n <= 1) {
+        🫡 n;
+    }
+    🫡 👀fibonacci(n - 1) + 👀fibonacci(n - 2);
 }
 
-🥸 num1 = 1;
-🥸 num2 = 2;
-🗣️("The sum of " + num1 + " and " + num2 + " is " + 👀sum(num1, num2));
+🗣️👀fibonacci(10);
 ```
+This will print 55. 
 
 6. **Example**
 
@@ -168,7 +170,7 @@ Here's an example utilizing several constructs from above:
     🤔(age ☝🤝 21) {
         🗣️("You can drink 😤!");
     } 🙈(age 🤝 20) {
-        🗣️("You're so close but you still can't drink 😩!");
+        🗣️("You're so close but funyou still can't drink 😩!");
     } 💅 {
         🗣️("You can't drink 😔!");
     }
