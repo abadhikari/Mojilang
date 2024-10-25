@@ -9,7 +9,7 @@ def test_sum_function_with_addition(capsys):
 
     🗣️(👀sum(1, 2) ➕ 2);
     """
-    expected_output = "5.0\n"
+    expected_output = "5\n"
     captured = run_interpreter_and_retrieve_output(source_code, capsys)
     assert captured.out == expected_output
 
@@ -23,7 +23,7 @@ def test_multiple_sum_function_calls(capsys):
     🗣️(👀sum(2, 3) ➕ 3);
     🗣️(6 ➕ 👀sum(1, 2));
     """
-    expected_output = "8.0\n9.0\n"
+    expected_output = "8\n9\n"
     captured = run_interpreter_and_retrieve_output(source_code, capsys)
     assert captured.out == expected_output
 
@@ -43,7 +43,7 @@ def test_multiple_functions(capsys):
     🥸 are_equal = 👀isEqual(summed_numbers, 5);
     🗣️ are_equal;
     """
-    expected_output = "5.0\n😤\n"
+    expected_output = "5\n😤\n"
     captured = run_interpreter_and_retrieve_output(source_code, capsys)
     assert captured.out == expected_output
 
@@ -60,7 +60,7 @@ def test_function_scope_shadowing(capsys):
     🗣️(👀add_two_to_x());
     🗣️(x);
     """
-    expected_output = "2.0\n5.0\n2.0\n"
+    expected_output = "2\n5\n2\n"
     captured = run_interpreter_and_retrieve_output(source_code, capsys)
     assert captured.out == expected_output
 
@@ -100,7 +100,7 @@ def test_function_closure(capsys):
     🗣️ x;
     👀 outer_function();
     """
-    expected_output = "5.0\n20.0\n1.0\n10.0\n"
+    expected_output = "5\n20\n1\n10\n"
     captured = run_interpreter_and_retrieve_output(source_code, capsys)
     assert captured.out == expected_output
 
@@ -115,7 +115,7 @@ def test_recursive_fibonacci(capsys):
     }
     🗣️👀fibonacci(10);
     """
-    expected_output = "55.0\n"
+    expected_output = "55\n"
     captured = run_interpreter_and_retrieve_output(source_code, capsys)
     assert captured.out == expected_output
 
@@ -124,7 +124,7 @@ def test_recursive_factorial(capsys):
     source_code = """
     🛠 factorial(🥸 num) {
         🤔(num == 0) {
-            🫡 1;
+            🫡 1.0;
         }
         🫡 num * 👀factorial(num - 1);
     }

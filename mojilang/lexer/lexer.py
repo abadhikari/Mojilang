@@ -231,7 +231,11 @@ class Lexer:
                 self._advance()
 
         number = self._source[self._start: self._current]
-        self._add_token(TokenType.NUMBER, float(number))
+        if '.' in number:
+            self._add_token(TokenType.FLOAT, float(number))
+        else:
+            self._add_token(TokenType.INTEGER, int(number))
+
 
     def _peek_next(self, next_count):
         """

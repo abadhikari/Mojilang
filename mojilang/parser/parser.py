@@ -5,7 +5,6 @@ from mojilang.parser.nodes import (
     ElseIfNode,
     ElseNode,
     BlockNode,
-    NumberLiteralNode,
     PrintNode,
     StringLiteralNode,
     VariableNode,
@@ -16,7 +15,9 @@ from mojilang.parser.nodes import (
     ContinueNode,
     FunctionNode,
     ReturnNode,
-    FunctionCallNode
+    FunctionCallNode,
+    IntegerLiteralNode,
+    FloatLiteralNode
 )
 from mojilang.parser.parser_state import ParserState
 from mojilang.parser.expression_parser import ExpressionParser
@@ -395,8 +396,10 @@ class Parser:
         line_number = self._state.current_line_number()
         if token.is_token_type(TokenType.STRING):
             return StringLiteralNode(token.get_literal(), line_number)
-        if token.is_token_type(TokenType.NUMBER):
-            return NumberLiteralNode(token.get_literal(), line_number)
+        if token.is_token_type(TokenType.INTEGER):
+            return IntegerLiteralNode(token.get_literal(), line_number)
+        if token.is_token_type(TokenType.FLOAT):
+            return FloatLiteralNode(token.get_literal(), line_number)
         if token.is_token_type(TokenType.TRUE):
             return BooleanLiteralNode(True, line_number)
         if token.is_token_type(TokenType.FALSE):

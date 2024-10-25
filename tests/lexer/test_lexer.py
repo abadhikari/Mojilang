@@ -18,7 +18,7 @@ class TestLexer:
             TokenType.VAR,
             TokenType.IDENTIFIER,
             TokenType.EQUAL,
-            TokenType.NUMBER,
+            TokenType.INTEGER,
             TokenType.SEMI_COLON,
             TokenType.EOF
         ]

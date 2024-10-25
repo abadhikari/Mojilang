@@ -47,7 +47,7 @@ def test_variable_scope_in_nested_if_statement(capsys):
         }
     }
     """
-    expected_output = "35.0\n"
+    expected_output = "35\n"
     captured = run_interpreter_and_retrieve_output(source_code, capsys)
     assert captured.out == expected_output
 
@@ -62,7 +62,7 @@ def test_reassign_global_variable_inside_loop(capsys):
     }
     🗣️(global_var);
     """
-    expected_output = "6.0\n"
+    expected_output = "6\n"
     captured = run_interpreter_and_retrieve_output(source_code, capsys)
     assert captured.out == expected_output
 
@@ -81,6 +81,6 @@ def test_multiple_variable_scopes(capsys):
         i ✍️ i ➖ 1;
     }
     """
-    expected_output = "5.0\n7.0\n6.0\n5.0\n4.0\n3.0\n5.0\n6.0\n5.0\n4.0\n3.0\n2.0\n"
+    expected_output = "5\n7\n6\n5\n4\n3\n5\n6\n5\n4\n3\n2\n"
     captured = run_interpreter_and_retrieve_output(source_code, capsys)
     assert captured.out == expected_output

@@ -9,7 +9,7 @@ def test_variable_reassignment(capsys):
     x ✍️ 20;
     🗣️(x);
     """
-    expected_output = "10.0\n20.0\n"
+    expected_output = "10\n20\n"
     captured = run_interpreter_and_retrieve_output(source_code, capsys)
     assert captured.out == expected_output
 
@@ -21,7 +21,7 @@ def test_reassignment_with_expression(capsys):
     y ✍️ y ➕ 10;
     🗣️(y);
     """
-    expected_output = "5.0\n15.0\n"
+    expected_output = "5\n15\n"
     captured = run_interpreter_and_retrieve_output(source_code, capsys)
     assert captured.out == expected_output
 
@@ -46,7 +46,7 @@ def test_multiple_reassignments(capsys):
     z ✍️ 3;
     🗣️(z);
     """
-    expected_output = "1.0\n2.0\n3.0\n"
+    expected_output = "1\n2\n3\n"
     captured = run_interpreter_and_retrieve_output(source_code, capsys)
     assert captured.out == expected_output
 

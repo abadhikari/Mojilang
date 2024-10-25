@@ -13,7 +13,7 @@ def test_while_loop_basic_countdown(capsys):
     }
     🗣️("Blast off!");
     """
-    expected_output = "10.0\n9.0\n8.0\n7.0\n6.0\n5.0\n4.0\n3.0\n2.0\n1.0\nBlast off!\n"
+    expected_output = "10\n9\n8\n7\n6\n5\n4\n3\n2\n1\nBlast off!\n"
     captured = run_interpreter_and_retrieve_output(source_code, capsys)
     assert captured.out == expected_output
 
@@ -46,7 +46,7 @@ def test_break_in_loop(capsys):
     }
     🗣️("Loop exited.");
     """
-    expected_output = "5.0\n4.0\n3.0\nLoop exited.\n"
+    expected_output = "5\n4\n3\nLoop exited.\n"
     captured = run_interpreter_and_retrieve_output(source_code, capsys)
     assert captured.out == expected_output
 
@@ -63,7 +63,7 @@ def test_continue_for_even_numbers_in_loop(capsys):
     }
     🗣️("Loop completed.");
     """
-    expected_output = "5.0\n3.0\n1.0\nLoop completed.\n"
+    expected_output = "5\n3\n1\nLoop completed.\n"
     captured = run_interpreter_and_retrieve_output(source_code, capsys)
     assert captured.out == expected_output
 
@@ -78,6 +78,6 @@ def test_assign_variable_inside_loop(capsys):
     }
     🗣️("Loop completed.");
     """
-    expected_output = "13.0\n12.0\n11.0\nLoop completed.\n"
+    expected_output = "13\n12\n11\nLoop completed.\n"
     captured = run_interpreter_and_retrieve_output(source_code, capsys)
     assert captured.out == expected_output

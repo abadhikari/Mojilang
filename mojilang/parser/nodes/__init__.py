@@ -20,7 +20,7 @@ from .control import (
     FunctionNode,
     ReturnNode
 )
-from .literal import LiteralNode, NumberLiteralNode, StringLiteralNode, BooleanLiteralNode
+from .literal import LiteralNode, StringLiteralNode, BooleanLiteralNode, IntegerLiteralNode, FloatLiteralNode
 from .operation import (
     AdditionNode,
     DivisionNode,
@@ -71,7 +71,8 @@ __all__ = [
 
     # Literal Nodes
     'LiteralNode',
-    'NumberLiteralNode',
+    'FloatLiteralNode',
+    'IntegerLiteralNode',
     'StringLiteralNode',
     'BooleanLiteralNode',
 

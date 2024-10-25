@@ -39,7 +39,8 @@ class TokenType(Enum):
     # Literals
     IDENTIFIER = 'IDENTIFIER'
     STRING = 'STRING'
-    NUMBER = 'NUMBER'
+    INTEGER = 'INTEGER'
+    FLOAT = 'FLOAT'
 
     # Keywords
     AND = 'AND'
@@ -68,7 +69,7 @@ class TokenType(Enum):
 
         :return: A set containing NUMBER, STRING, TRUE, and FALSE token types.
         """
-        return {cls.NUMBER, cls.STRING, cls.TRUE, cls.FALSE}
+        return {cls.INTEGER, cls.FLOAT, cls.STRING, cls.TRUE, cls.FALSE}
 
     @classmethod
     def valid_print_types(cls):
