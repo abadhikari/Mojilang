@@ -12,7 +12,8 @@ It's currently written in Python which will be terribly slow but I wanted/E to c
   - [Lexer](#lexer)
   - [Parser](#parser)
   - [Interpreter](#interpreter)
-- [Syntax Overview](#syntax)
+- [Syntax](#syntax)
+  - [Examples](#examples)
   - [Syntax Rolodex](#syntax-rolodex)
 - [License](#license)
 
@@ -100,6 +101,8 @@ The interpreter handles all the logic and operations defined by Mojilang, such a
 ## Syntax
 Mojilang uses emojis to represent common programming constructs. Below is an overview of the syntax:
 
+### Examples
+
 1. **Variables**
  
 Define variables using the 🥸 emoji, followed by the variable name, the assignment emoji ✍️, a value, and semicolon (all statements must end in a semicolon):
@@ -152,22 +155,28 @@ The 🛠️ emoji is used for functions, 🥸 is used for the parameters, 🫡 i
   🫡 num1 ➕ num2;
 }
 
-🗣️(👀sum(1, 2) ➕ 2);
+🥸 num1 = 1;
+🥸 num2 = 2;
+🗣️("The sum of " + num1 + " and " + num2 + " is " + 👀sum(num1, num2));
 ```
 
 6. **Example**
 
 Here's an example utilizing several constructs from above:
 ```
-🥸 age ✍️ 20;
-🤔(age ☝️ 21) {
-    🗣️("You can drink 😤!");
-} 🙈(age 🤝 20) {
-    🗣️("You're so close but you still can't drink 😩!");
-} 💅 {
-    🗣️("You can't drink 😔!");
+🛠️ canDrink(🥸 age) {
+    🤔(age ☝🤝 21) {
+        🗣️("You can drink 😤!");
+    } 🙈(age 🤝 20) {
+        🗣️("You're so close but you still can't drink 😩!");
+    } 💅 {
+        🗣️("You can't drink 😔!");
+    }
 }
+
+👀 canDrink(20);
 ```
+This will print "You're so close but you still can't drink 😩!".
 
 ### Syntax Rolodex ###
 

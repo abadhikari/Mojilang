@@ -1,0 +1,13 @@
+🛠️ canDrink(🥸 age) {
+    🤔(age ☝🤝 21) {
+        🗣️("You can drink 😤!");
+    } 🙈(age 🤝 20) {
+        🗣️("You're so close but you still can't drink 😩!");
+    } 💅 {
+        🗣️("You can't drink 😔!");
+    }
+}
+
+👀 canDrink(19);
+👀 canDrink(20);
+👀 canDrink(21);

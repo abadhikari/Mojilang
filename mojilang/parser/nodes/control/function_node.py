@@ -1,5 +1,6 @@
 from mojilang.parser.nodes.abstract_syntax_tree_node import AbstractSyntaxTreeNode
 from mojilang.parser.nodes.callable import Callable
+from mojilang.parser.nodes.control.return_value import ReturnValue
 
 
 class FunctionNode(AbstractSyntaxTreeNode, Callable):
@@ -12,7 +13,10 @@ class FunctionNode(AbstractSyntaxTreeNode, Callable):
     def evaluate(self, context):
         context.assign_value(self._function_name, self)
 
-    def call(self, context, arguments):
-        for arg_name, arg_value in zip(self._argument_names, arguments):
+    def call(self, context, argument_values):
+        arguments = zip(self._argument_names, argument_values)
+        for arg_name, arg_value in arguments:
             context.assign_value(arg_name, arg_value)
-        return self._function_block_node.evaluate(context)
+
+        return_value = self._function_block_node.evaluate(context)
+        return return_value.get_value() if isinstance(return_value, ReturnValue) else return_value

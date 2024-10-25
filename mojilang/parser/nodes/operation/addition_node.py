@@ -8,4 +8,6 @@ class AdditionNode(OperationNode):
     def evaluate(self, context):
         left_value = self.get_left_operand().evaluate(context)
         right_value = self.get_right_operand().evaluate(context)
+        if isinstance(left_value, str) or isinstance(right_value, str):
+            return str(left_value) + str(right_value)
         return left_value + right_value

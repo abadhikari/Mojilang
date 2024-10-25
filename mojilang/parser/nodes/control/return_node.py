@@ -1,4 +1,5 @@
 from mojilang.parser.nodes.abstract_syntax_tree_node import AbstractSyntaxTreeNode
+from mojilang.parser.nodes.control.return_value import ReturnValue
 
 
 class ReturnNode(AbstractSyntaxTreeNode):
@@ -7,4 +8,4 @@ class ReturnNode(AbstractSyntaxTreeNode):
         self._return_value_node = return_value_node
 
     def evaluate(self, context):
-        return self._return_value_node.evaluate(context)
+        return ReturnValue(self._return_value_node.evaluate(context))

@@ -103,3 +103,65 @@ def test_function_closure(capsys):
     expected_output = "5.0\n20.0\n1.0\n10.0\n"
     captured = run_interpreter_and_retrieve_output(source_code, capsys)
     assert captured.out == expected_output
+
+
+def test_recursive_fibonacci(capsys):
+    source_code = """
+    🛠 fibonacci(🥸 n) {
+        🤔(n <= 1) {
+            🫡 n;
+        }
+        🫡 👀fibonacci(n - 1) + 👀fibonacci(n - 2);
+    }
+    🗣️👀fibonacci(10);
+    """
+    expected_output = "55.0\n"
+    captured = run_interpreter_and_retrieve_output(source_code, capsys)
+    assert captured.out == expected_output
+
+
+def test_recursive_factorial(capsys):
+    source_code = """
+    🛠 factorial(🥸 num) {
+        🤔(num == 0) {
+            🫡 1;
+        }
+        🫡 num * 👀factorial(num - 1);
+    }
+    🗣️👀factorial(5);
+    """
+    expected_output = "120.0\n"
+    captured = run_interpreter_and_retrieve_output(source_code, capsys)
+    assert captured.out == expected_output
+
+
+def test_undefined_function_call(capsys):
+    source_code = """
+    🛠 factorial(🥸 num) {
+        🤔(num == 0) {
+            🫡 1;
+        }
+        🫡 num * 👀factorial(num - 1);
+    }
+    🗣️👀fibonacci(10);
+    """
+    try:
+        run_interpreter_and_retrieve_output(source_code, capsys)
+    except Exception as e:
+        assert "Function 'fibonacci' has not yet been defined" in str(e)
+
+def test_return_outside_function(capsys):
+    source_code = """
+    🛠 factorial(🥸 num) {
+        🤔(num == 0) {
+            🫡 1;
+        }
+        🫡 num * 👀factorial(num - 1);
+    }
+    🫡 1;
+    🗣️👀factorial(5);
+    """
+    try:
+        run_interpreter_and_retrieve_output(source_code, capsys)
+    except Exception as e:
+        assert "'return' outside of function" in str(e)
